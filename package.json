@@ -1,0 +1,30 @@
+{
+  "name": "spinal-models-context_studio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d  build -s inline"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spinalcom/spinal-models-context_studio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/spinalcom/spinal-models-context_studio/issues"
+  },
+  "homepage": "https://github.com/spinalcom/spinal-models-context_studio#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-es2015": "^6.24.1",
+    "spinal-core-connectorjs": "git+https://github.com/spinalcom/spinal-core-connectorjs.git"
+  },
+  "dependencies": {
+    "spinal-models-bim_forge": "git+https://github.com/spinalcom/spinal-models-bim_forge.git"
+  }
+}
