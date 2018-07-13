@@ -1,5 +1,15 @@
 const spinalCore = require("spinal-core-connectorjs");
 const globalType = typeof window === "undefined" ? global : window;
+import SpinalNode from "./SpinalNode"
+import SpinalRelation from "./SpinalRelation"
+import AbstractElement from "./AbstractElement"
+import BIMElement from "./BIMElement"
+
+
+import {
+  Utilities
+} from "./Utilities"
+
 
 export default class Graph extends globalType.Model {
   constructor(_name, _startingVertex, name = "Graph") {
@@ -7,6 +17,7 @@ export default class Graph extends globalType.Model {
     if (FileSystem._sig_server) {
       this.add_attr({
         name: _name || "",
+        externalIdVertexDic: new Model(),
         startingVertex: _startingVertex || new Ptr(0),
         vertexList: new Ptr(new Lst()),
         vertexListByElementType: new Model(),
@@ -15,6 +26,31 @@ export default class Graph extends globalType.Model {
       });
     }
   }
+
+  init() {
+    globalType.spinal.contextStudio = {}
+    globalType.spinal.contextStudio.graph = this
+    globalType.spinal.contextStudio.SpinalNode = SpinalNode
+    globalType.spinal.contextStudio.SpinalRelation = SpinalRelation
+    globalType.spinal.contextStudio.AbstractElement = AbstractElement
+    globalType.spinal.contextStudio.BIMElement = BIMElement
+    globalType.spinal.contextStudio.Utilities = Utilities
+  }
+
+  async getNodeBydbId(_dbId) {
+    let _externalId = await Utilities.getExternalId(_dbId)
+    return this.externalIdVertexDic[_externalId]
+  }
+
+  async getDbIdByNode(_vertex) {
+    let element = await Utilities.promiseLoad(_vertex.element)
+    if (element instanceof BIMElement) {
+      let _dbId = await Utilities.getDbIdByExternalId(element.id.get())
+      return _dbId;
+    }
+  }
+
+
 
   guid() {
     return (
@@ -47,39 +83,112 @@ export default class Graph extends globalType.Model {
     this.name.set(_name)
   }
 
-  addStartingVertex(_startingVertex) {
+  setStartingVertex(_startingVertex) {
     this.mod_attr("startingVertex", new Ptr(_startingVertex))
   }
 
-  addVertex(_vertex) {
-    _vertex.graph.set(this);
-    this.vertexList.load(vertexList => {
-      vertexList.push(_vertex)
-    })
-    if (this.vertexListByElementType[_vertex.element.type.get()]) {
-      this.vertexListByElementType[_vertex.element.type.get()].load(
-        vertexListOfType => {
-          vertexListOfType.push(_vertex)
-        })
+  async _addExternalIdVertexDicEntry(_ElementId, _vertex) {
+    let _dbid = _ElementId.get()
+    if (typeof _dbid == "number")
+      if (_dbid != 0) {
+        let externalId = await Utilities.getExternalId(_dbid)
+        if (typeof this.externalIdVertexDic[externalId] === "undefined")
+          this.externalIdVertexDic.add_attr({
+            [externalId]: _vertex
+          })
+        _ElementId.unbind(this._addExternalIdVertexDicEntry.bind(null,
+          _ElementId))
+      }
+  }
+
+  addVertex(_element) {
+    if (_element instanceof BIMElement && typeof this.externalIdVertexDic[
+        _element.id.get()] !== "undefined") {
+      console.log("BIM OBJECT NODE ALREADY EXISTS");
+      return this.externalIdVertexDic[_element.id.get()]
     } else {
-      let vertexListOfType = new Lst()
-      vertexListOfType.push(_vertex);
-      this.vertexListByElementType.add_attr({
-        [_vertex.element.type.get()]: new Ptr(
-          vertexListOfType)
-      })
+      let name = ""
+      if (typeof _element.name !== "undefined") {
+        name = _element.name.get();
+      }
+      let vertex = new SpinalNode(name, _element, this);
+      return vertex;
+
     }
+  }
+
+  classifyVertex(_vertex) {
+    Utilities.promiseLoad(_vertex.element).then(element => {
+      _vertex.graph.set(this);
+      this.vertexList.load(vertexList => {
+        vertexList.push(_vertex)
+      })
+      let type = element.constructor.name
+      if (typeof element.type != "undefined") {
+        type = element.type.get()
+      }
+      if (this.vertexListByElementType[type]) {
+        this.vertexListByElementType[type].load(
+          vertexListOfType => {
+            vertexListOfType.push(_vertex)
+          })
+      } else {
+        let vertexListOfType = new Lst()
+        vertexListOfType.push(_vertex);
+        this.vertexListByElementType.add_attr({
+          [type]: new Ptr(
+            vertexListOfType)
+        })
+      }
+      if (element instanceof BIMElement) {
+        let _dbid = element.id.get()
+        if (typeof _dbid == "number")
+          if (_dbid != 0) {
+            this._addExternalIdVertexDicEntry(element.id, _vertex)
+          }
+        else {
+          element.id.bind(this._addExternalIdVertexDicEntry.bind(null,
+            element.id, _vertex))
+        }
+      }
+    })
   }
 
   addVertices(_vertices) {
     for (let index = 0; index < _vertices.length; index++) {
-      this.addVertex(_vertices[index])
+      this.classifyVertex(_vertices[index])
+    }
+  }
+
+  addRelation(_relation) {
+    for (let index = 0; index < _relation.vertexList1.length; index++) {
+      const vertex = _relation.vertexList1[index];
+      vertex.addRelation(_relation)
+    }
+    if (_relation.isDirected.get()) {
+      for (let index = 0; index < _relation.vertexList2.length; index++) {
+        const vertex = _relation.vertexList2[index];
+        vertex.addDirectedRelationChild(_relation)
+      }
+    } else {
+      for (let index = 0; index < _relation.vertexList2.length; index++) {
+        const vertex = _relation.vertexList2[index];
+        vertex.addRelation(_relation)
+      }
+    }
+    this._classifyRelation(_relation);
+  }
+
+  addRelations(_relations) {
+    for (let index = 0; index < _relations.length; index++) {
+      const relation = _relations[index];
+      this.addRelation(relation)
     }
   }
 
 
 
-  addRelation(_relation) {
+  _classifyRelation(_relation) {
     this.relationList.load(relationList => {
       relationList.push(_relation)
     })
@@ -98,27 +207,22 @@ export default class Graph extends globalType.Model {
     }
   }
 
-  addRelations(_relations) {
+  _classifyRelations(_relations) {
     for (let index = 0; index < _relations.length; index++) {
-      this.addRelation(_relations[index])
+      this.classRelation(_relations[index])
     }
   }
 
-  static _contains(_list, _vertex) {
-    for (let index = 0; index < _list.length; index++) {
-      const element = _list[index];
-      if (element.id.get() == _vertex.id.get())
-        return true
-    }
-    return false
-  }
+
 
   _addNotExistingVerticesFromList(_list) {
     this.vertexList.load(vertexList => {
       for (let i = 0; i < _list.length; i++) {
         let vertex = _list[i];
-        if (!Graph._contains(vertexList, vertex))
-          this.addVertex(vertex)
+        if (!Utilities.contains(vertexList, vertex)) {
+          this.classifyVertex(vertex)
+          console.log("test");
+        }
       }
     })
   }

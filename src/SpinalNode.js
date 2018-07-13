@@ -4,6 +4,11 @@ let getViewer = function() {
   return globalType.v;
 };
 
+import {
+  Utilities
+} from "./Utilities"
+
+
 export default class SpinalNode extends globalType.Model {
   constructor(_name, _element, _graph, _relations) {
     super();
@@ -11,13 +16,13 @@ export default class SpinalNode extends globalType.Model {
       this.add_attr({
         name: _name,
         id: this.guid(),
-        element: _element,
+        element: new Ptr(_element),
         relations: new Model(),
         graph: new Ptr(_graph)
       });
       if (typeof this.graph !== "undefined") {
         this.graph.load(g => {
-          g.addVertex(this);
+          g.classifyVertex(this);
         })
       }
       if (typeof _relations !== "undefined") {
@@ -60,44 +65,97 @@ export default class SpinalNode extends globalType.Model {
     return this.relations.length !== 0;
   }
 
+  addDirectedRelationChild(_relation) {
+    let name = _relation.type.get()
+    name = name.replace(/e?.$/, "edBy")
+    this.addRelation(_relation, name)
+  }
 
-
-  addRelation(_relation) {
-    this.graph.load(graph => {
-      graph.addRelation(_relation)
-      graph._addNotExistingVerticesFromRelation(_relation)
-    })
+  addRelation(_relation, _name) {
+    let name = _relation.type.get()
+    if (typeof _name !== "undefined") {
+      name = _name
+    }
     if (typeof this.relations[_relation.type.get()] !== "undefined")
-      this.relations[_relation.type.get()].load(relationList => {
-        relationList.push(_relation)
-      })
+      this.relations[_relation.type.get()].push(_relation);
     else {
       let list = new Lst();
       list.push(_relation)
       this.relations.add_attr({
-        [_relation.type.get()]: new Ptr(list)
+        [name]: list
       })
     }
   }
 
-  addRelations(_relations) {
-    for (let index = 0; index < _relations.length; index++) {
-      this.addRelation(_relations[index]);
+
+  addRelation2(_relation, _name) {
+    let classify = false;
+    let name = _relation.type.get()
+    if (typeof _name !== "undefined") {
+      name = _name
     }
+    if (typeof this.relations[_relation.type.get()] !== "undefined") {
+      if (_relation.isDirected.get()) {
+        for (let index = 0; index < this.relations[_relation.type.get()].length; index++) {
+          const element = this.relations[_relation.type.get()][index];
+          if (Utilities.arraysEqual(_relation.getVertexList1Ids(),
+              element.getVertexList1Ids())) {
+            element.addNotExistingVerticestoVertexList2(_relation.vertexList2)
+          } else {
+            element.push(_relation);
+            classify = true
+          }
+        }
+      } else {
+        this.relations[_relation.type.get()].addNotExistingVerticestoRelation(
+          _relation)
+      }
+    } else {
+      if (_relation.isDirected.get()) {
+        let list = new Lst();
+        list.push(_relation)
+        this.relations.add_attr({
+          [name]: list
+        })
+        this._classifyRelation(_relation);
+      } else {
+        this.relations.add_attr({
+          [name]: _relation
+        })
+        classify = true
+
+      }
+    }
+    if (classify) this._classifyRelation(_relation);
   }
 
-  promiseLoad(_ptr) {
-    return new Promise(resolve => {
-      _ptr.load(resolve);
-    });
+  _classifyRelation(_relation) {
+    this.graph.load(graph => {
+      graph._classifyRelation(_relation)
+    })
   }
 
-  async getRelations(_type) {
+  //TODO :NotWorking
+  // addRelation(_relation) {
+  //   this.addRelation(_relation)
+  //   this.graph.load(graph => {
+  //     graph._addNotExistingVerticesFromRelation(_relation)
+  //   })
+  // }
+  //TODO :NotWorking
+  // addRelations(_relations) {
+  //   for (let index = 0; index < _relations.length; index++) {
+  //     this.addRelation(_relations[index]);
+  //   }
+  // }
+
+
+  getRelations(_type) {
     let res = []
     if (typeof _type === "undefined") {
-      for (let index = 0; index < this.relations.attr_attribute_names.length; index++) {
-        const attribute = this.relations.attr_attribute_names[index];
-        let relList = await this.promiseLoad(attribute)
+      for (let index = 0; index < this.relations._attribute_names.length; index++) {
+        const relList = this.relations[this.relations._attribute_names[
+          index]];
         for (let index = 0; index < relList.length; index++) {
           const relation = relList[index];
           res.push(relation)
@@ -105,8 +163,7 @@ export default class SpinalNode extends globalType.Model {
       }
       return res;
     } else {
-      let relList = await this.promiseLoad(this.relations[_type])
-      return relList;
+      return this.relations[_type];
     }
   }
 
@@ -132,19 +189,19 @@ export default class SpinalNode extends globalType.Model {
     }
   }
 
-  async getNeighbors(_type) {
-    neighbors = []
-    let relations = await this.getRelations(_type)
+  getNeighbors(_type) {
+    let neighbors = []
+    let relations = this.getRelations(_type)
     for (let index = 0; index < relations.length; index++) {
       const relation = relations[index];
       if (relation.isDirected.get()) {
-        if (this.inVertexList(relation.vertexlist1))
-          neighbors = neighbors.concat(relation.vertexlist2)
+        if (this.inVertexList(relation.vertexList1))
+          neighbors = neighbors.concat(relation.vertexList2)
         else
-          neighbors = neighbors.concat(relation.vertexlist1)
+          neighbors = neighbors.concat(relation.vertexList1)
       } else {
-        neighbors = neighbors.concat(this.allButMe(relation.vertexlist1));
-        neighbors = neighbors.concat(this.allButMe(relation.vertexlist2))
+        neighbors = neighbors.concat(this.allButMe(relation.vertexList1));
+        neighbors = neighbors.concat(this.allButMe(relation.vertexList2))
       }
     }
     return neighbors
@@ -152,10 +209,8 @@ export default class SpinalNode extends globalType.Model {
 
 
 
-  async removeRelation(_relation) {
-    let relationLst = await this.promiseLoad(this.relations[_relation
-      .type
-      .get()])
+  removeRelation(_relation) {
+    let relationLst = this.relations[_relation.type.get()]
     for (let index = 0; index < relationLst.length; index++) {
       const candidateRelation = relationLst[index];
       if (_relation.id.get() === candidateRelation.id.get())
@@ -163,7 +218,7 @@ export default class SpinalNode extends globalType.Model {
     }
   }
 
-  async removeRelations(_relations) {
+  removeRelations(_relations) {
     for (let index = 0; index < _relations.length; index++) {
       this.removeRelation(_relations[index])
     }
