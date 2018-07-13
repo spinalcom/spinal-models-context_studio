@@ -113,7 +113,6 @@ export default class Graph extends globalType.Model {
       }
       let vertex = new SpinalNode(name, _element, this);
       return vertex;
-
     }
   }
 
