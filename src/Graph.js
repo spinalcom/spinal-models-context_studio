@@ -9,7 +9,13 @@ import SpinalContext from "./SpinalContext";
 import {
   Utilities
 } from "./Utilities";
-
+/**
+ *
+ *
+ * @export
+ * @class Graph
+ * @extends {globalType.Model}
+ */
 export default class Graph extends globalType.Model {
   constructor(_name, _startingNode, name = "Graph") {
     super();
@@ -27,7 +33,11 @@ export default class Graph extends globalType.Model {
       });
     }
   }
-
+  /**
+   *
+   *
+   * @memberof Graph
+   */
   init() {
     globalType.spinal.contextStudio = {};
     globalType.spinal.contextStudio.graph = this;
@@ -37,7 +47,13 @@ export default class Graph extends globalType.Model {
     globalType.spinal.contextStudio.BIMElement = BIMElement;
     globalType.spinal.contextStudio.Utilities = Utilities;
   }
-
+  /**
+   *
+   *
+   * @param {*} _dbId
+   * @returns Promise of the corresponding Node 
+   * @memberof Graph
+   */
   async getNodeBydbId(_dbId) {
     let _externalId = await Utilities.getExternalId(_dbId);
     if (typeof this.externalIdNodeMapping[_externalId] !== "undefined")
@@ -54,27 +70,54 @@ export default class Graph extends globalType.Model {
       return node;
     }
   }
-
+  /**
+   *
+   *
+   * @param {*} _node
+   * @memberof Graph
+   */
   async _classifyBIMElementNode(_node) {
     //TODO DELETE OLD CLASSIFICATION
     this.classifyNode(_node);
   }
-
+  /**
+   *
+   *
+   * @param {*} _node
+   * @returns dbId
+   * @memberof Graph
+   */
   async getDbIdByNode(_node) {
     let element = await Utilities.promiseLoad(_node.element);
     if (element instanceof BIMElement) {
       return element.id.get();
     }
   }
-
+  /**
+   *
+   *
+   * @param {*} _name
+   * @memberof Graph
+   */
   setName(_name) {
     this.name.set(_name);
   }
-
+  /**
+   *
+   *
+   * @param {*} _startingNode
+   * @memberof Graph
+   */
   setStartingNode(_startingNode) {
     this.startingNode.set(_startingNode);
   }
-
+  /**
+   *
+   *
+   * @param {*} _ElementId
+   * @param {*} _node
+   * @memberof Graph
+   */
   async _addExternalIdNodeMappingEntry(_ElementId, _node) {
     let _dbid = _ElementId.get();
     if (typeof _dbid == "number")
@@ -92,7 +135,13 @@ export default class Graph extends globalType.Model {
         );
       }
   }
-
+  /**
+   *
+   *
+   * @param {*} _element
+   * @returns Promise of the created Node
+   * @memberof Graph
+   */
   async addNodeAsync(_element) {
     let name = "";
     if (_element instanceof BIMElement) {
@@ -119,7 +168,13 @@ export default class Graph extends globalType.Model {
     let node = new SpinalNode(name, _element, this);
     return node;
   }
-
+  /**
+   *
+   *
+   * @param {*} _element
+   * @returns the created Node
+   * @memberof Graph
+   */
   addNode(_element) {
     let name = "";
     if (_element instanceof BIMElement) {
@@ -146,7 +201,12 @@ export default class Graph extends globalType.Model {
     let node = new SpinalNode(name, _element, this);
     return node;
   }
-
+  /**
+   *
+   *
+   * @param {*} _node
+   * @memberof Graph
+   */
   classifyNode(_node) {
     Utilities.promiseLoad(_node.element).then(element => {
       if (typeof _node.graph === "undefined") _node.graph.set(this);
@@ -193,19 +253,44 @@ export default class Graph extends globalType.Model {
   //     this.classifyNode(_vertices[index])
   //   }
   // }
-
+  /**
+   *
+   *
+   * @param {*} _relationType
+   * @param {*} _node
+   * @param {*} _element
+   * @param {*} _isDirected
+   * @returns Promise of the created Relation
+   * @memberof Graph
+   */
   async addSimpleRelationAsync(_relationType, _node, _element, _isDirected) {
     let node2 = await this.addNodeAsync(_element);
     let rel = new SpinalRelation(_relationType, _node, node2, _isDirected);
+    this.addRelation(rel)
     return rel;
   }
-
+  /**
+   *
+   *
+   * @param {*} _relationType
+   * @param {*} _node
+   * @param {*} _element
+   * @param {*} _isDirected
+   * @returns the created Relation
+   * @memberof Graph
+   */
   addSimpleRelation(_relationType, _node, _element, _isDirected) {
     let node2 = this.addNode(_element);
     let rel = new SpinalRelation(_relationType, _node, node2, _isDirected);
+    this.addRelation(rel)
     return rel;
   }
-
+  /**
+   *
+   *
+   * @param {*} _relation
+   * @memberof Graph
+   */
   addRelation(_relation) {
     if (_relation.isDirected.get()) {
       for (let index = 0; index < _relation.nodeList1.length; index++) {
@@ -228,7 +313,12 @@ export default class Graph extends globalType.Model {
     }
     this._classifyRelation(_relation);
   }
-
+  /**
+   *
+   *
+   * @param {*} _relations
+   * @memberof Graph
+   */
   addRelations(_relations) {
     for (let index = 0; index < _relations.length; index++) {
       const relation = _relations[index];
@@ -274,7 +364,16 @@ export default class Graph extends globalType.Model {
     this._addNotExistingNodesFromList(_relation.nodeList1);
     this._addNotExistingNodesFromList(_relation.nodeList2);
   }
-
+  /**
+   *
+   *
+   * @param {*} _name
+   * @param {*} _usedRelations
+   * @param {*} _startingNode
+   * @param {*} _usedGraph
+   * @returns the created Relation
+   * @memberof Graph
+   */
   addContext(_name, _usedRelations, _startingNode, _usedGraph) {
     let context = new SpinalContext(_name, _usedRelations, _startingNode,
       _usedGraph)
