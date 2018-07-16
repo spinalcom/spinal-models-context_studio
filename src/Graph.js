@@ -1,178 +1,229 @@
 const spinalCore = require("spinal-core-connectorjs");
 const globalType = typeof window === "undefined" ? global : window;
-import SpinalNode from "./SpinalNode"
-import SpinalRelation from "./SpinalRelation"
-import AbstractElement from "./AbstractElement"
-import BIMElement from "./BIMElement"
-
+import SpinalNode from "./SpinalNode";
+import SpinalRelation from "./SpinalRelation";
+import AbstractElement from "./AbstractElement";
+import BIMElement from "./BIMElement";
+import SpinalContext from "./SpinalContext";
 
 import {
   Utilities
-} from "./Utilities"
-
+} from "./Utilities";
 
 export default class Graph extends globalType.Model {
-  constructor(_name, _startingVertex, name = "Graph") {
+  constructor(_name, _startingNode, name = "Graph") {
     super();
     if (FileSystem._sig_server) {
       this.add_attr({
         name: _name || "",
-        externalIdVertexDic: new Model(),
-        startingVertex: _startingVertex || new Ptr(0),
-        vertexList: new Ptr(new Lst()),
-        vertexListByElementType: new Model(),
+        externalIdNodeMapping: new Model(),
+        guidAbstractNodeMapping: new Model(),
+        startingNode: _startingNode || new Ptr(0),
+        nodeList: new Ptr(new Lst()),
+        nodeListByElementType: new Model(),
         relationList: new Ptr(new Lst()),
-        relationListByType: new Model()
+        relationListByType: new Model(),
+        contextList: new Lst()
       });
     }
   }
 
   init() {
-    globalType.spinal.contextStudio = {}
-    globalType.spinal.contextStudio.graph = this
-    globalType.spinal.contextStudio.SpinalNode = SpinalNode
-    globalType.spinal.contextStudio.SpinalRelation = SpinalRelation
-    globalType.spinal.contextStudio.AbstractElement = AbstractElement
-    globalType.spinal.contextStudio.BIMElement = BIMElement
-    globalType.spinal.contextStudio.Utilities = Utilities
+    globalType.spinal.contextStudio = {};
+    globalType.spinal.contextStudio.graph = this;
+    globalType.spinal.contextStudio.SpinalNode = SpinalNode;
+    globalType.spinal.contextStudio.SpinalRelation = SpinalRelation;
+    globalType.spinal.contextStudio.AbstractElement = AbstractElement;
+    globalType.spinal.contextStudio.BIMElement = BIMElement;
+    globalType.spinal.contextStudio.Utilities = Utilities;
   }
 
   async getNodeBydbId(_dbId) {
-    let _externalId = await Utilities.getExternalId(_dbId)
-    return this.externalIdVertexDic[_externalId]
-  }
-
-  async getDbIdByNode(_vertex) {
-    let element = await Utilities.promiseLoad(_vertex.element)
-    if (element instanceof BIMElement) {
-      let _dbId = await Utilities.getDbIdByExternalId(element.id.get())
-      return _dbId;
+    let _externalId = await Utilities.getExternalId(_dbId);
+    if (typeof this.externalIdNodeMapping[_externalId] !== "undefined")
+      return this.externalIdNodeMapping[_externalId];
+    else {
+      let BIMElement1 = new BIMElement(_dbId);
+      BIMElement1.initExternalId();
+      let node = await this.addNodeAsync(BIMElement1);
+      if (BIMElement1.type.get() === "") {
+        BIMElement1.type.bind(
+          this._classifyBIMElementNode.bind(this, node)
+        );
+      }
+      return node;
     }
   }
 
-
-
-  guid() {
-    return (
-      this.constructor.name +
-      "-" +
-      this.s4() +
-      this.s4() +
-      "-" +
-      this.s4() +
-      "-" +
-      this.s4() +
-      "-" +
-      this.s4() +
-      "-" +
-      this.s4() +
-      this.s4() +
-      this.s4() +
-      "-" +
-      Date.now().toString(16)
-    );
+  async _classifyBIMElementNode(_node) {
+    //TODO DELETE OLD CLASSIFICATION
+    this.classifyNode(_node);
   }
 
-  s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
+  async getDbIdByNode(_node) {
+    let element = await Utilities.promiseLoad(_node.element);
+    if (element instanceof BIMElement) {
+      return element.id.get();
+    }
   }
 
   setName(_name) {
-    this.name.set(_name)
+    this.name.set(_name);
   }
 
-  setStartingVertex(_startingVertex) {
-    this.mod_attr("startingVertex", new Ptr(_startingVertex))
+  setStartingNode(_startingNode) {
+    this.startingNode.set(_startingNode);
   }
 
-  async _addExternalIdVertexDicEntry(_ElementId, _vertex) {
-    let _dbid = _ElementId.get()
+  async _addExternalIdNodeMappingEntry(_ElementId, _node) {
+    let _dbid = _ElementId.get();
     if (typeof _dbid == "number")
       if (_dbid != 0) {
-        let externalId = await Utilities.getExternalId(_dbid)
-        if (typeof this.externalIdVertexDic[externalId] === "undefined")
-          this.externalIdVertexDic.add_attr({
-            [externalId]: _vertex
-          })
-        _ElementId.unbind(this._addExternalIdVertexDicEntry.bind(null,
-          _ElementId))
+        let externalId = await Utilities.getExternalId(_dbid);
+        let element = await Utilities.promiseLoad(_node.element);
+        await element.initExternalId();
+        if (typeof this.externalIdNodeMapping[externalId] === "undefined")
+          this.externalIdNodeMapping.add_attr({
+            [externalId]: _node
+          });
+        _ElementId.unbind(
+          this._addExternalIdNodeMappingEntry.bind(this, _ElementId,
+            _node)
+        );
       }
   }
 
-  addVertex(_element) {
-    if (_element instanceof BIMElement && typeof this.externalIdVertexDic[
-        _element.id.get()] !== "undefined") {
-      console.log("BIM OBJECT NODE ALREADY EXISTS");
-      return this.externalIdVertexDic[_element.id.get()]
-    } else {
-      let name = ""
-      if (typeof _element.name !== "undefined") {
-        name = _element.name.get();
+  async addNodeAsync(_element) {
+    let name = "";
+    if (_element instanceof BIMElement) {
+      await _element.initExternalIdAsync();
+      if (
+        typeof this.externalIdNodeMapping[_element.externalId.get()] !==
+        "undefined"
+      ) {
+        console.log("BIM OBJECT NODE ALREADY EXISTS");
+        return this.externalIdNodeMapping[_element.externalId.get()];
       }
-      let vertex = new SpinalNode(name, _element, this);
-      return vertex;
+    } else if (_element instanceof AbstractElement) {
+      if (
+        typeof this.guidAbstractNodeMapping[_element.id.get()] !==
+        "undefined"
+      ) {
+        console.log("ABSTRACT OBJECT NODE ALREADY EXISTS");
+        return this.guidAbstractNodeMapping[_element.id.get()];
+      }
     }
+    if (typeof _element.name !== "undefined") {
+      name = _element.name.get();
+    }
+    let node = new SpinalNode(name, _element, this);
+    return node;
   }
 
-  classifyVertex(_vertex) {
-    Utilities.promiseLoad(_vertex.element).then(element => {
-      _vertex.graph.set(this);
-      this.vertexList.load(vertexList => {
-        vertexList.push(_vertex)
-      })
-      let type = element.constructor.name
-      if (typeof element.type != "undefined") {
-        type = element.type.get()
+  addNode(_element) {
+    let name = "";
+    if (_element instanceof BIMElement) {
+      _element.initExternalId();
+      if (
+        typeof this.externalIdNodeMapping[_element.externalId.get()] !==
+        "undefined"
+      ) {
+        console.log("BIM OBJECT NODE ALREADY EXISTS");
+        return this.externalIdNodeMapping[_element.externalId.get()];
       }
-      if (this.vertexListByElementType[type]) {
-        this.vertexListByElementType[type].load(
-          vertexListOfType => {
-            vertexListOfType.push(_vertex)
-          })
+    } else if (_element instanceof AbstractElement) {
+      if (
+        typeof this.guidAbstractNodeMapping[_element.id.get()] !==
+        "undefined"
+      ) {
+        console.log("ABSTRACT OBJECT NODE ALREADY EXISTS");
+        return this.guidAbstractNodeMapping[_element.id.get()];
+      }
+    }
+    if (typeof _element.name !== "undefined") {
+      name = _element.name.get();
+    }
+    let node = new SpinalNode(name, _element, this);
+    return node;
+  }
+
+  classifyNode(_node) {
+    Utilities.promiseLoad(_node.element).then(element => {
+      if (typeof _node.graph === "undefined") _node.graph.set(this);
+      this.nodeList.load(nodeList => {
+        nodeList.push(_node);
+      });
+      let type = "UnClassified";
+      if (typeof element.type != "undefined" && element.type.get() !=
+        "") {
+        type = element.type.get();
+      }
+      if (this.nodeListByElementType[type]) {
+        this.nodeListByElementType[type].load(nodeListOfType => {
+          nodeListOfType.push(_node);
+        });
       } else {
-        let vertexListOfType = new Lst()
-        vertexListOfType.push(_vertex);
-        this.vertexListByElementType.add_attr({
-          [type]: new Ptr(
-            vertexListOfType)
-        })
+        let nodeListOfType = new Lst();
+        nodeListOfType.push(_node);
+        this.nodeListByElementType.add_attr({
+          [type]: new Ptr(nodeListOfType)
+        });
       }
       if (element instanceof BIMElement) {
-        let _dbid = element.id.get()
+        let _dbid = element.id.get();
         if (typeof _dbid == "number")
           if (_dbid != 0) {
-            this._addExternalIdVertexDicEntry(element.id, _vertex)
+            this._addExternalIdNodeMappingEntry(element.id, _node);
+          } else {
+            element.id.bind(
+              this._addExternalIdNodeMappingEntry.bind(null, element.id,
+                _node)
+            );
           }
-        else {
-          element.id.bind(this._addExternalIdVertexDicEntry.bind(null,
-            element.id, _vertex))
-        }
+      } else if (element instanceof AbstractElement) {
+        this.guidAbstractNodeMapping.add_attr({
+          [element.id.get()]: _node
+        });
       }
-    })
+    });
   }
 
-  addVertices(_vertices) {
-    for (let index = 0; index < _vertices.length; index++) {
-      this.classifyVertex(_vertices[index])
-    }
+  // addNodes(_vertices) {
+  //   for (let index = 0; index < _vertices.length; index++) {
+  //     this.classifyNode(_vertices[index])
+  //   }
+  // }
+
+  async addSimpleRelationAsync(_relationType, _node, _element, _isDirected) {
+    let node2 = await this.addNodeAsync(_element);
+    let rel = new SpinalRelation(_relationType, _node, node2, _isDirected);
+    return rel;
+  }
+
+  addSimpleRelation(_relationType, _node, _element, _isDirected) {
+    let node2 = this.addNode(_element);
+    let rel = new SpinalRelation(_relationType, _node, node2, _isDirected);
+    return rel;
   }
 
   addRelation(_relation) {
-    for (let index = 0; index < _relation.vertexList1.length; index++) {
-      const vertex = _relation.vertexList1[index];
-      vertex.addRelation(_relation)
-    }
     if (_relation.isDirected.get()) {
-      for (let index = 0; index < _relation.vertexList2.length; index++) {
-        const vertex = _relation.vertexList2[index];
-        vertex.addDirectedRelationChild(_relation)
+      for (let index = 0; index < _relation.nodeList1.length; index++) {
+        const node = _relation.nodeList1[index];
+        node.addDirectedRelationParent(_relation);
+      }
+      for (let index = 0; index < _relation.nodeList2.length; index++) {
+        const node = _relation.nodeList2[index];
+        node.addDirectedRelationChild(_relation);
       }
     } else {
-      for (let index = 0; index < _relation.vertexList2.length; index++) {
-        const vertex = _relation.vertexList2[index];
-        vertex.addRelation(_relation)
+      for (let index = 0; index < _relation.nodeList1.length; index++) {
+        const node = _relation.nodeList1[index];
+        node.addNonDirectedRelation(_relation);
+      }
+      for (let index = 0; index < _relation.nodeList2.length; index++) {
+        const node = _relation.nodeList2[index];
+        node.addNonDirectedRelation(_relation);
       }
     }
     this._classifyRelation(_relation);
@@ -181,56 +232,55 @@ export default class Graph extends globalType.Model {
   addRelations(_relations) {
     for (let index = 0; index < _relations.length; index++) {
       const relation = _relations[index];
-      this.addRelation(relation)
+      this.addRelation(relation);
     }
   }
 
-
-
   _classifyRelation(_relation) {
     this.relationList.load(relationList => {
-      relationList.push(_relation)
-    })
+      relationList.push(_relation);
+    });
     if (this.relationListByType[_relation.type.get()]) {
-      this.relationListByType[_relation.type.get()].load(
-        relationListOfType => {
-          relationListOfType.push(_relation)
-        })
+      this.relationListByType[_relation.type.get()].load(relationListOfType => {
+        relationListOfType.push(_relation);
+      });
     } else {
-      let relationListOfType = new Lst()
+      let relationListOfType = new Lst();
       relationListOfType.push(_relation);
       this.relationListByType.add_attr({
-        [_relation.type.get()]: new Ptr(
-          relationListOfType)
-      })
+        [_relation.type.get()]: new Ptr(relationListOfType)
+      });
     }
   }
 
   _classifyRelations(_relations) {
     for (let index = 0; index < _relations.length; index++) {
-      this.classRelation(_relations[index])
+      this.classRelation(_relations[index]);
     }
   }
 
-
-
-  _addNotExistingVerticesFromList(_list) {
-    this.vertexList.load(vertexList => {
+  _addNotExistingNodesFromList(_list) {
+    this.nodeList.load(nodeList => {
       for (let i = 0; i < _list.length; i++) {
-        let vertex = _list[i];
-        if (!Utilities.contains(vertexList, vertex)) {
-          this.classifyVertex(vertex)
-          console.log("test");
+        let node = _list[i];
+        if (!Utilities.contains(nodeList, node)) {
+          this.classifyNode(node);
         }
       }
-    })
+    });
   }
 
-  _addNotExistingVerticesFromRelation(_relation) {
-    this._addNotExistingVerticesFromList(_relation.vertexList1)
-    this._addNotExistingVerticesFromList(_relation.vertexList2)
+  _addNotExistingNodesFromRelation(_relation) {
+    this._addNotExistingNodesFromList(_relation.nodeList1);
+    this._addNotExistingNodesFromList(_relation.nodeList2);
   }
 
+  addContext(_name, _usedRelations, _startingNode, _usedGraph) {
+    let context = new SpinalContext(_name, _usedRelations, _startingNode,
+      _usedGraph)
+    this.contextList.push(context)
+    return context;
+  }
 }
 
-spinalCore.register_models([Graph])
+spinalCore.register_models([Graph]);

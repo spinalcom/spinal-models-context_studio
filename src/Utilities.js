@@ -2,22 +2,33 @@ let Utilities = {}
 const globalType = typeof window === "undefined" ? global : window;
 
 Utilities.getViewer = function() {
-  return globalType.v;
-};
+  return new Promise((resolve, reject) => {
+    if (globalType.v === "undefined") {
+      let interval = setInterval(() => {
+        if (globalType.v !== "undefined") {
+          resolve(globalType.v)
+          clearInterval(interval)
+        }
+      }, 500);
+    } else resolve(globalType.v)
+  })
+}
 
 Utilities.promiseGetProperties = function(_dbId) {
   return new Promise(resolve => {
-    let viewer = Utilities.getViewer()
-    viewer.getProperties(_dbId, resolve);
+    Utilities.getViewer().then(viewer => {
+      viewer.getProperties(_dbId, resolve);
+    })
   });
 }
 
 Utilities.promiseGetExternalIdMapping = function(_externalId) {
   return new Promise(resolve => {
-    let viewer = Utilities.getViewer()
-    viewer.model.getExternalIdMapping(res => {
-      resolve(res[_externalId])
-    });
+    Utilities.getViewer().then(viewer => {
+      viewer.model.getExternalIdMapping(res => {
+        resolve(res[_externalId])
+      });
+    })
   });
 }
 
@@ -54,10 +65,10 @@ Utilities.arraysEqual = function(arrayA, arrayB) {
   return true;
 }
 
-Utilities.contains = function(_list, _vertex) {
+Utilities.contains = function(_list, _node) {
   for (let index = 0; index < _list.length; index++) {
     const element = _list[index];
-    if (element.id.get() == _vertex.id.get())
+    if (element.id.get() == _node.id.get())
       return true
   }
   return false
@@ -81,6 +92,56 @@ Utilities.getIds = function(array) {
 // Utilities.addNotExisting = function(arr, obj) {
 //   return (arr.indexOf(obj));
 // }
+
+Utilities.concat = function(listA, listB) {
+  let res = []
+  for (let index = 0; index < listA.length; index++) {
+    res.push(listA[index])
+  }
+  for (let index = 0; index < listB.length; index++) {
+    res.push(listB[index])
+  }
+  return res;
+}
+
+Utilities.allButMeById = function(_list) {
+  let res = [];
+  for (let index = 0; index < _list.length; index++) {
+    const node = _list[index];
+    if (node.id.get() != this.id.get()) {
+      res.push(node);
+    }
+    return res;
+  }
+}
+
+Utilities.guid = function(_constructor) {
+  return (
+    _constructor +
+    "-" +
+    this.s4() +
+    this.s4() +
+    "-" +
+    this.s4() +
+    "-" +
+    this.s4() +
+    "-" +
+    this.s4() +
+    "-" +
+    this.s4() +
+    this.s4() +
+    this.s4() +
+    "-" +
+    Date.now().toString(16)
+  );
+}
+
+Utilities.s4 = function() {
+  return Math.floor((1 + Math.random()) * 0x10000)
+    .toString(16)
+    .substring(1);
+}
+
 
 
 export {

@@ -9,119 +9,117 @@ import {
 } from "./Utilities"
 
 export default class SpinalRelation extends globalType.Model {
-  constructor(_type, _vertexList1, _vertexList2, _isDirected) {
+  constructor(_type, _nodeList1, _nodeList2, _isDirected, name =
+    "SpinalRelation") {
     super();
     if (FileSystem._sig_server) {
       this.add_attr({
-        id: this.guid(),
+        id: Utilities.guid(this.constructor.name),
         type: _type,
-        vertexList1: _vertexList1,
-        vertexList2: _vertexList2,
+        nodeList1: _nodeList1,
+        nodeList2: _nodeList2,
         isDirected: _isDirected || false
       });
     }
   }
 
-  guid() {
-    return (
-      this.constructor.name +
-      "-" +
-      this.s4() +
-      this.s4() +
-      "-" +
-      this.s4() +
-      "-" +
-      this.s4() +
-      "-" +
-      this.s4() +
-      "-" +
-      this.s4() +
-      this.s4() +
-      this.s4() +
-      "-" +
-      Date.now().toString(16)
-    );
-  }
-
-  s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-  }
-
-  getVertexList1Ids() {
+  getNodeList1Ids() {
     let t = []
-    for (let index = 0; index < this.vertexList1.length; index++) {
-      const element = this.vertexList1[index];
+    for (let index = 0; index < this.nodeList1.length; index++) {
+      const element = this.nodeList1[index];
       t.push(element.id.get())
     }
     return t
   }
 
-  getVertexList1List2Ids() {
+  getNodeList2Ids() {
     let t = []
-    for (let index = 0; index < this.vertexList1.length; index++) {
-      const element = this.vertexList1[index];
-      t.push(element.id.get())
-    }
-    for (let index = 0; index < this.vertexList2.length; index++) {
-      const element = this.vertexList2[index];
+    for (let index = 0; index < this.nodeList2.length; index++) {
+      const element = this.nodeList2[index];
       t.push(element.id.get())
     }
     return t
   }
 
-  addNotExistingVertextoVertexList1(_vertex) {
-    if (!Utilities.contains(this.vertexList1, _vertex))
-      this.vertexList1.push(_vertex)
+  getNodeList1List2Ids() {
+    let t = []
+    for (let index = 0; index < this.nodeList1.length; index++) {
+      const element = this.nodeList1[index];
+      t.push(element.id.get())
+    }
+    for (let index = 0; index < this.nodeList2.length; index++) {
+      const element = this.nodeList2[index];
+      t.push(element.id.get())
+    }
+    return t
   }
 
-  addNotExistingVerticestoVertexList1(_vertices) {
-    for (let index = 0; index < _vertices.length; index++) {
-      const element = _vertices[index];
-      this.addNotExistingVertextoVertexList1(element)
+  addNotExistingNodetoNodeList1(_node) {
+    if (!Utilities.contains(this.nodeList1, _node))
+      this.nodeList1.push(_node)
+  }
+
+  addNotExistingNodestoNodeList1(_nodes) {
+    for (let index = 0; index < _nodes.length; index++) {
+      const element = _nodes[index];
+      this.addNotExistingNodetoNodeList1(element)
     }
   }
 
-  addNotExistingVertextoVertexList2(_vertex) {
-    if (!Utilities.contains(this.vertexList2, _vertex))
-      this.vertexList2.push(_vertex)
+  addNotExistingNodetoNodeList2(_node) {
+    if (!Utilities.contains(this.nodeList2, _node))
+      this.nodeList2.push(_node)
   }
 
-  addNotExistingVerticestoVertexList2(_vertices) {
-    console.log(_vertices);
+  addNotExistingNodestoNodeList2(_nodes) {
+    console.log(_nodes);
 
-    for (let index = 0; index < _vertices.length; index++) {
-      const element = _vertices[index];
-      this.addNotExistingVertextoVertexList2(element)
+    for (let index = 0; index < _nodes.length; index++) {
+      const element = _nodes[index];
+      this.addNotExistingNodetoNodeList2(element)
     }
   }
 
-  addNotExistingVertextoRelation(_relation) {
+  addNotExistingNodetoRelation(_relation) {
     other = []
-    for (let index = 0; index < _relation.vertexList1.length; index++) {
-      const element = _relation.vertexList1[index];
+    for (let index = 0; index < _relation.nodeList1.length; index++) {
+      const element = _relation.nodeList1[index];
       other.push(element)
     }
-    for (let index = 0; index < _relation.vertexList2.length; index++) {
-      const element = _relation.vertexList2[index];
+    for (let index = 0; index < _relation.nodeList2.length; index++) {
+      const element = _relation.nodeList2[index];
       other.push(element)
     }
 
     me = []
-    for (let index = 0; index < this.vertexList1.length; index++) {
-      const element = this.vertexList1[index];
+    for (let index = 0; index < this.nodeList1.length; index++) {
+      const element = this.nodeList1[index];
       me.push(element)
     }
-    for (let index = 0; index < this.vertexList2.length; index++) {
-      const element = this.vertexList2[index];
+    for (let index = 0; index < this.nodeList2.length; index++) {
+      const element = this.nodeList2[index];
       me.push(element)
     }
     for (let index = 0; index < other.length; index++) {
-      const vertex = other[index]
-      if (!Utilities.contains(me, vertex))
-        this.vertexList2.push(vertex)
+      const node = other[index]
+      if (!Utilities.contains(me, node))
+        this.nodeList2.push(node)
     }
+  }
+
+  toJson() {
+    return {
+      id: this.id.get(),
+      type: this.type.get(),
+      nodeList1: this.getNodeList1Ids(),
+      nodeList2: this.getNodeList2Ids(),
+      isDirected: this.isDirected.get()
+    }
+  }
+
+  toIfc(element1Id, element2Id) {
+    return this.type + '(' + this.id.get() + ',' + '$' + '$' + element1Id +
+      ',' + element2Id + ');'
   }
 }
 
