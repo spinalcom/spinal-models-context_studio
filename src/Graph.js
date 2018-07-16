@@ -17,6 +17,13 @@ import {
  * @extends {globalType.Model}
  */
 export default class Graph extends globalType.Model {
+  /**
+   *Creates an instance of Graph.
+   * @param {*} _name
+   * @param {*} _startingNode
+   * @param {string} [name="Graph"]
+   * @memberof Graph
+   */
   constructor(_name, _startingNode, name = "Graph") {
     super();
     if (FileSystem._sig_server) {
@@ -265,7 +272,8 @@ export default class Graph extends globalType.Model {
    */
   async addSimpleRelationAsync(_relationType, _node, _element, _isDirected) {
     let node2 = await this.addNodeAsync(_element);
-    let rel = new SpinalRelation(_relationType, _node, node2, _isDirected);
+    let rel = new SpinalRelation(_relationType, [_node], [node2],
+      _isDirected);
     this.addRelation(rel)
     return rel;
   }
@@ -281,7 +289,8 @@ export default class Graph extends globalType.Model {
    */
   addSimpleRelation(_relationType, _node, _element, _isDirected) {
     let node2 = this.addNode(_element);
-    let rel = new SpinalRelation(_relationType, _node, node2, _isDirected);
+    let rel = new SpinalRelation(_relationType, [_node], [node2],
+      _isDirected);
     this.addRelation(rel)
     return rel;
   }
@@ -292,6 +301,7 @@ export default class Graph extends globalType.Model {
    * @memberof Graph
    */
   addRelation(_relation) {
+
     if (_relation.isDirected.get()) {
       for (let index = 0; index < _relation.nodeList1.length; index++) {
         const node = _relation.nodeList1[index];
@@ -325,7 +335,12 @@ export default class Graph extends globalType.Model {
       this.addRelation(relation);
     }
   }
-
+  /**
+   *
+   *
+   * @param {*} _relation
+   * @memberof Graph
+   */
   _classifyRelation(_relation) {
     this.relationList.load(relationList => {
       relationList.push(_relation);
@@ -342,13 +357,23 @@ export default class Graph extends globalType.Model {
       });
     }
   }
-
+  /**
+   *
+   *
+   * @param {*} _relations
+   * @memberof Graph
+   */
   _classifyRelations(_relations) {
     for (let index = 0; index < _relations.length; index++) {
       this.classRelation(_relations[index]);
     }
   }
-
+  /**
+   *
+   *
+   * @param {*} _list
+   * @memberof Graph
+   */
   _addNotExistingNodesFromList(_list) {
     this.nodeList.load(nodeList => {
       for (let i = 0; i < _list.length; i++) {
@@ -359,7 +384,12 @@ export default class Graph extends globalType.Model {
       }
     });
   }
-
+  /**
+   *
+   *
+   * @param {*} _relation
+   * @memberof Graph
+   */
   _addNotExistingNodesFromRelation(_relation) {
     this._addNotExistingNodesFromList(_relation.nodeList1);
     this._addNotExistingNodesFromList(_relation.nodeList2);
@@ -371,7 +401,7 @@ export default class Graph extends globalType.Model {
    * @param {*} _usedRelations
    * @param {*} _startingNode
    * @param {*} _usedGraph
-   * @returns the created Relation
+   * @returns the created Context
    * @memberof Graph
    */
   addContext(_name, _usedRelations, _startingNode, _usedGraph) {
