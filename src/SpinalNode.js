@@ -401,7 +401,7 @@ export default class SpinalNode extends globalType.Model {
   }
 
   getRelationsByAppNameByType(appName, type) {
-    let res = [];
+    let res = new Lst();
     for (let index = 0; index < this.apps[appName]._attribute_names.length; index++) {
       const appRelation = this.apps[appName][this.apps[appName]._attribute_names[
         index]];
