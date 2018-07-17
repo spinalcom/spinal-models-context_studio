@@ -402,6 +402,7 @@ export default class SpinalNode extends globalType.Model {
 
   getRelationsByAppNameByType(appName, type) {
     let res = new Lst();
+
     for (let index = 0; index < this.apps[appName]._attribute_names.length; index++) {
       const appRelation = this.apps[appName][this.apps[appName]._attribute_names[
         index]];
@@ -410,9 +411,13 @@ export default class SpinalNode extends globalType.Model {
     return res;
   }
 
-  getRelationsByAppByType(app, type) {
+  getRelationsByAppByType(app, relationType) {
     let appName = app.name.get()
-    return this.getRelationsByAppNameByType(appName, type)
+    if (this.hasRelationByAppByTypeDefined(appName, relationType))
+      return this.getRelationsByAppNameByType(appName, relationType)
+    else {
+      return undefined
+    }
   }
 
   inNodeList(_nodelist) {

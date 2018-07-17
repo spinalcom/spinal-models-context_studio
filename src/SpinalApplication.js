@@ -100,7 +100,7 @@ class SpinalApplication extends globalType.Model {
   getRelationsByNodeByType(node, relationType) {
     if (node.hasRelationByAppByTypeDefined(this.name.get(), relationType))
       return node.getRelationsByAppNameByType(this.name.get(), relationType)
-    else return new Lst()
+    else return undefined
   }
 
 
