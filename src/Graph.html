@@ -1,0 +1,445 @@
+<html>
+<header><title>This is title</title></header>
+<body>
+<p><a name="Graph"></a></p>
+<h2 id="graph">Graph</h2>
+<p>The core of the interactions between the BIMElements Nodes and other Nodes(Docs, Tickets, etc ..)</p>
+<p><strong>Kind</strong>: global class  </p>
+<ul>
+<li><a href="#Graph">Graph</a><ul>
+<li><a href="#new_Graph_new">new Graph([_name], [_startingNode])</a></li>
+<li><a href="#Graph+init">.init()</a></li>
+<li><a href="#Graph+getNodeBydbId">.getNodeBydbId(_dbId)</a> ⇒</li>
+<li><a href="#Graph+_classifyBIMElementNode">._classifyBIMElementNode(_node)</a></li>
+<li><a href="#Graph+getDbIdByNode">.getDbIdByNode(_node)</a> ⇒</li>
+<li><a href="#Graph+setName">.setName(_name)</a></li>
+<li><a href="#Graph+setStartingNode">.setStartingNode(_startingNode)</a></li>
+<li><a href="#Graph+_addExternalIdNodeMappingEntry">._addExternalIdNodeMappingEntry(_ElementId, _node)</a></li>
+<li><a href="#Graph+addNodeAsync">.addNodeAsync(_element)</a> ⇒</li>
+<li><a href="#Graph+addNode">.addNode(_element)</a> ⇒</li>
+<li><a href="#Graph+classifyNode">.classifyNode(_node)</a></li>
+<li><a href="#Graph+addSimpleRelationAsync">.addSimpleRelationAsync(_relationType, _node, _element, [_isDirected])</a> ⇒</li>
+<li><a href="#Graph+addSimpleRelation">.addSimpleRelation(_relationType, _node, _element, [_isDirected])</a> ⇒</li>
+<li><a href="#Graph+addRelation">.addRelation(_relation)</a></li>
+<li><a href="#Graph+addRelations">.addRelations(_relations)</a></li>
+<li><a href="#Graph+_classifyRelation">._classifyRelation(_relation)</a></li>
+<li><a href="#Graph+_classifyRelations">._classifyRelations(_relations)</a></li>
+<li><a href="#Graph+_addNotExistingNodesFromList">._addNotExistingNodesFromList(_list)</a></li>
+<li><a href="#Graph+_addNotExistingNodesFromRelation">._addNotExistingNodesFromRelation(_relation)</a></li>
+<li><a href="#Graph+addContext">.addContext(_name, _usedRelations, _startingNode, [_usedGraph])</a> ⇒</li>
+</ul>
+</li>
+</ul>
+<p><a name="new_Graph_new"></a></p>
+<h3 id="new-graph-_name-_startingnode-">new Graph([_name], [_startingNode])</h3>
+<p>Creates an instance of Graph.</p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[_name]</td>
+<td><code>string</code></td>
+<td><code>&quot;t&quot;</code></td>
+</tr>
+<tr>
+<td>[_startingNode]</td>
+<td><code>Ptr</code></td>
+<td><code>new Ptr(0)</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+init"></a></p>
+<h3 id="graph-init-">graph.init()</h3>
+<p>function
+To put used functions as well as the graph model in the global scope</p>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a><br><a name="Graph+getNodeBydbId"></a></p>
+<h3 id="graph-getnodebydbid-_dbid-">graph.getNodeBydbId(_dbId) ⇒</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a><br><strong>Returns</strong>: Promise of the corresponding Node or the created one if not existing  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_dbId</td>
+<td><code>number</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+_classifyBIMElementNode"></a></p>
+<h3 id="graph-_classifybimelementnode-_node-">graph._classifyBIMElementNode(_node)</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_node</td>
+<td><code>SpinalNode</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+getDbIdByNode"></a></p>
+<h3 id="graph-getdbidbynode-_node-">graph.getDbIdByNode(_node) ⇒</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a><br><strong>Returns</strong>: Promise of dbId [number]  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_node</td>
+<td><code>SpinalNode</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+setName"></a></p>
+<h3 id="graph-setname-_name-">graph.setName(_name)</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_name</td>
+<td><code>string</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+setStartingNode"></a></p>
+<h3 id="graph-setstartingnode-_startingnode-">graph.setStartingNode(_startingNode)</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_startingNode</td>
+<td><code>Ptr</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+_addExternalIdNodeMappingEntry"></a></p>
+<h3 id="graph-_addexternalidnodemappingentry-_elementid-_node-">graph._addExternalIdNodeMappingEntry(_ElementId, _node)</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_ElementId</td>
+<td><code>number</code></td>
+<td>the Element ExternalId</td>
+</tr>
+<tr>
+<td>_node</td>
+<td><code>SpinalNode</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+addNodeAsync"></a></p>
+<h3 id="graph-addnodeasync-_element-">graph.addNodeAsync(_element) ⇒</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a><br><strong>Returns</strong>: Promise of the created Node  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_element</td>
+<td><code>Model</code></td>
+<td>any subClass of Model</td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+addNode"></a></p>
+<h3 id="graph-addnode-_element-">graph.addNode(_element) ⇒</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a><br><strong>Returns</strong>: the created Node  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_element</td>
+<td><code>Model</code></td>
+<td>any subClass of Model</td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+classifyNode"></a></p>
+<h3 id="graph-classifynode-_node-">graph.classifyNode(_node)</h3>
+<p>Observes the type of the element inside the node add Classify it.
+ It puts it in the Unclassified list Otherwise.
+It adds the node to the mapping list with ExternalId if the Object is of type BIMElement</p>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_node</td>
+<td><code>SpinalNode</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+addSimpleRelationAsync"></a></p>
+<h3 id="graph-addsimplerelationasync-_relationtype-_node-_element-_isdirected-">graph.addSimpleRelationAsync(_relationType, _node, _element, [_isDirected]) ⇒</h3>
+<p>It creates the node corresponding to the _element, 
+then it creates a simple relation of class SpinalRelation of type:_type.</p>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a><br><strong>Returns</strong>: a Promise of the created relation  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_relationType</td>
+<td><code>string</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>_node</td>
+<td><code>SpinalNode</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>_element</td>
+<td><code>Model</code></td>
+<td></td>
+<td>any subClass of Model</td>
+</tr>
+<tr>
+<td>[_isDirected]</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+addSimpleRelation"></a></p>
+<h3 id="graph-addsimplerelation-_relationtype-_node-_element-_isdirected-">graph.addSimpleRelation(_relationType, _node, _element, [_isDirected]) ⇒</h3>
+<p>It creates the node corresponding to the _element, 
+then it creates a simple relation of class SpinalRelation of type:_type.</p>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a><br><strong>Returns</strong>: a Promise of the created relation  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_relationType</td>
+<td><code>string</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>_node</td>
+<td><code>SpinalNode</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>_element</td>
+<td><code>Model</code></td>
+<td></td>
+<td>any subClass of Model</td>
+</tr>
+<tr>
+<td>[_isDirected]</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+addRelation"></a></p>
+<h3 id="graph-addrelation-_relation-">graph.addRelation(_relation)</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_relation</td>
+<td><code>SpinalRelation</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+addRelations"></a></p>
+<h3 id="graph-addrelations-_relations-">graph.addRelations(_relations)</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_relations</td>
+<td><code>SpinalRelations</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+_classifyRelation"></a></p>
+<h3 id="graph-_classifyrelation-_relation-">graph._classifyRelation(_relation)</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_relation</td>
+<td><code>SpinalRelation</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+_classifyRelations"></a></p>
+<h3 id="graph-_classifyrelations-_relations-">graph._classifyRelations(_relations)</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_relations</td>
+<td><code>SpinalRelations</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+_addNotExistingNodesFromList"></a></p>
+<h3 id="graph-_addnotexistingnodesfromlist-_list-">graph._addNotExistingNodesFromList(_list)</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_list</td>
+<td><code>Lst</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+_addNotExistingNodesFromRelation"></a></p>
+<h3 id="graph-_addnotexistingnodesfromrelation-_relation-">graph._addNotExistingNodesFromRelation(_relation)</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a>  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_relation</td>
+<td><code>SpinalRelations</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Graph+addContext"></a></p>
+<h3 id="graph-addcontext-_name-_usedrelations-_startingnode-_usedgraph-">graph.addContext(_name, _usedRelations, _startingNode, [_usedGraph]) ⇒</h3>
+<p><strong>Kind</strong>: instance method of <a href="#Graph"><code>Graph</code></a><br><strong>Returns</strong>: The created Context  </p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_name</td>
+<td><code>string</code></td>
+<td></td>
+</tr>
+<tr>
+<td>_usedRelations</td>
+<td><code>strings</code></td>
+<td></td>
+</tr>
+<tr>
+<td>_startingNode</td>
+<td><code>SpinalNode</code></td>
+<td></td>
+</tr>
+<tr>
+<td>[_usedGraph]</td>
+<td><a href="#Graph"><code>Graph</code></a></td>
+<td><code>this</code></td>
+</tr>
+</tbody>
+</table>
+
+</body>
+</html>

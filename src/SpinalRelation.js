@@ -55,8 +55,12 @@ export default class SpinalRelation extends globalType.Model {
   }
 
   addNotExistingNodetoNodeList1(_node) {
-    if (!Utilities.contains(this.nodeList1, _node))
+    if (!Utilities.containsLstById(this.nodeList1, _node))
       this.nodeList1.push(_node)
+  }
+
+  addNodetoNodeList1(_node) {
+    this.nodeList1.push(_node)
   }
 
   addNotExistingNodestoNodeList1(_nodes) {
@@ -66,8 +70,12 @@ export default class SpinalRelation extends globalType.Model {
     }
   }
 
+  addNodetoNodeList2(_node) {
+    this.nodeList2.push(_node)
+  }
+
   addNotExistingNodetoNodeList2(_node) {
-    if (!Utilities.contains(this.nodeList2, _node))
+    if (!Utilities.containsLstById(this.nodeList2, _node))
       this.nodeList2.push(_node)
   }
 
@@ -102,7 +110,7 @@ export default class SpinalRelation extends globalType.Model {
     }
     for (let index = 0; index < other.length; index++) {
       const node = other[index]
-      if (!Utilities.contains(me, node))
+      if (!Utilities.containsLstById(me, node))
         this.nodeList2.push(node)
     }
   }

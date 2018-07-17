@@ -65,10 +65,28 @@ Utilities.arraysEqual = function(arrayA, arrayB) {
   return true;
 }
 
-Utilities.contains = function(_list, _node) {
+Utilities.containsLstById = function(_list, _node) {
   for (let index = 0; index < _list.length; index++) {
     const element = _list[index];
     if (element.id.get() == _node.id.get())
+      return true
+  }
+  return false
+}
+
+Utilities.containsLstModel = function(_list, _model) {
+  for (let index = 0; index < _list.length; index++) {
+    const element = _list[index];
+    if (element.get() == _model.get())
+      return true
+  }
+  return false
+}
+
+Utilities.containsLst = function(_list, _element) {
+  for (let index = 0; index < _list.length; index++) {
+    const element = _list[index];
+    if (element.get() == _element)
       return true
   }
   return false
@@ -140,6 +158,18 @@ Utilities.s4 = function() {
   return Math.floor((1 + Math.random()) * 0x10000)
     .toString(16)
     .substring(1);
+}
+
+Utilities.putOnTopLst = function(lst, elementB) {
+  lst.remove_ref(elementB);
+  lst.unshift(elementB);
+  // for (let index = 0; index < lst.length; index++) {
+  //   const element = lst[index];
+  //   if (element.id.get() === elementB.id.get()) {
+  //     lst.remove(index);
+  //   }
+
+  // }
 }
 
 
