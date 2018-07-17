@@ -13,6 +13,7 @@ class SpinalApplication extends globalType.Model {
         name: _name,
         relationsTypesLst: relationsTypesLst,
         relationsByType: new Model(),
+        realtionsLst: new Lst(),
         relatedGraph: relatedGraph
       });
     }
@@ -37,6 +38,10 @@ class SpinalApplication extends globalType.Model {
     }
   }
 
+  getCharacteristicElement() {
+    return this.realtionsLst;
+  }
+
   addRelation(relation) {
     if (!this.relatedGraph.isReserved(relation.type.get())) {
       this.addRelationType(relation.type.get());
@@ -52,6 +57,7 @@ class SpinalApplication extends globalType.Model {
           relationTypeLst.push(relation)
         })
       }
+      this.realtionsLst.push(relation)
     } else {
       console.log(
         relation.type.get() +
@@ -98,9 +104,7 @@ class SpinalApplication extends globalType.Model {
   }
 
   getRelationsByNodeByType(node, relationType) {
-    if (node.hasRelationByAppByTypeDefined(this.name.get(), relationType))
-      return node.getRelationsByAppNameByType(this.name.get(), relationType)
-    else return undefined
+    return node.getRelationsByAppNameByType(this.name.get(), relationType)
   }
 
 

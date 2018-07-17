@@ -387,12 +387,14 @@ export default class SpinalNode extends globalType.Model {
 
   getRelationsByAppName(appName) {
     let res = [];
-    for (let index = 0; index < this.apps[appName]._attribute_names.length; index++) {
-      const appRelation = this.apps[appName][this.apps[appName]._attribute_names[
-        index]];
-      res.push(appRelation);
-    }
-    return res;
+    if (this.hasAppDefined(appName)) {
+      for (let index = 0; index < this.apps[appName]._attribute_names.length; index++) {
+        const appRelation = this.apps[appName][this.apps[appName]._attribute_names[
+          index]];
+        res.push(appRelation);
+      }
+      return res;
+    } else return undefined
   }
 
   getRelationsByApp(app) {
@@ -400,24 +402,24 @@ export default class SpinalNode extends globalType.Model {
     return this.getRelationsByAppName(appName)
   }
 
-  getRelationsByAppNameByType(appName, type) {
-    let res = new Lst();
-
-    for (let index = 0; index < this.apps[appName]._attribute_names.length; index++) {
-      const appRelation = this.apps[appName][this.apps[appName]._attribute_names[
-        index]];
-      if (appRelation.type.get() === type) res.push(appRelation);
+  getRelationsByAppNameByType(appName, relationType) {
+    let res = [];
+    if (this.hasRelationByAppByTypeDefined(appName, relationType)) {
+      for (let index = 0; index < this.apps[appName]._attribute_names.length; index++) {
+        const appRelation = this.apps[appName][this.apps[appName]._attribute_names[
+          index]];
+        if (appRelation.type.get() === relationType) res.push(appRelation);
+      }
+      return res;
+    } else {
+      return undefined
     }
-    return res;
   }
 
   getRelationsByAppByType(app, relationType) {
     let appName = app.name.get()
-    if (this.hasRelationByAppByTypeDefined(appName, relationType))
-      return this.getRelationsByAppNameByType(appName, relationType)
-    else {
-      return undefined
-    }
+    return this.getRelationsByAppNameByType(appName, relationType)
+
   }
 
   inNodeList(_nodelist) {
@@ -484,7 +486,7 @@ export default class SpinalNode extends globalType.Model {
       return true
     else {
       console.warn("app " + appName +
-        " is not defined for node " + this.get());
+        " is not defined for node " + this.name.get());
       return false
     }
   }
