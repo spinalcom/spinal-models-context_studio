@@ -497,7 +497,7 @@ class Graph extends globalType.Model {
       });
       return spinalApplication;
     } else {
-      this.appsList[name]
+      return this.appsList[name]
       // console.error(
       //   name +
       //   " as well as " +
