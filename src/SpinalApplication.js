@@ -47,6 +47,10 @@ class SpinalApplication extends globalType.Model {
         this.relationsByType.add_attr({
           [relation.type.get()]: new Ptr(list)
         });
+      } else {
+        this.relationsByType[relation.type.get()].load(relationTypeLst => {
+          relationTypeLst.push(relation)
+        })
       }
     } else {
       console.log(
