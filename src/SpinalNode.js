@@ -227,7 +227,7 @@ class SpinalNode extends globalType.Model {
    * @param {string} relationType
    * @param {Model} element - and subClass of Model
    * @param {boolean} [isDirected=false]
-   * @returns
+   * @returns the created relation, undefined otherwise
    * @memberof SpinalNode
    */
   addSimpleRelation(relationType, element, isDirected = false) {
@@ -277,11 +277,11 @@ class SpinalNode extends globalType.Model {
   /**
    *
    *
-   * @param {*} relationType
-   * @param {*} element
+   * @param {string} relationType
+   * @param {Model} element - any subClass of Model
    * @param {boolean} [isDirected=false]
    * @param {boolean} [asParent=false]
-   * @returns
+   * @returns the relation with the added element node in (nodeList2)
    * @memberof SpinalNode
    */
   addToExistingRelation(
@@ -326,7 +326,17 @@ class SpinalNode extends globalType.Model {
       );
     }
   }
-
+  /**
+   *
+   *
+   * @param {string} appName
+   * @param {string} relationType
+   * @param {Model} element - any subClass of Model
+   * @param {boolean} [isDirected=false]
+   * @param {boolean} [asParent=false]
+   * @returns the relation with the added element node in (nodeList2)
+   * @memberof SpinalNode
+   */
   addToExistingRelationByApp(
     appName,
     relationType,
@@ -384,53 +394,59 @@ class SpinalNode extends globalType.Model {
 
 
 
-  addRelation2(_relation, _name) {
-    let classify = false;
-    let name = _relation.type.get();
-    if (typeof _name !== "undefined") {
-      name = _name;
-    }
-    if (typeof this.relations[_relation.type.get()] !== "undefined") {
-      if (_relation.isDirected.get()) {
-        for (
-          let index = 0; index < this.relations[_relation.type.get()].length; index++
-        ) {
-          const element = this.relations[_relation.type.get()][index];
-          if (
-            Utilities.arraysEqual(
-              _relation.getNodeList1Ids(),
-              element.getNodeList1Ids()
-            )
-          ) {
-            element.addNotExistingVerticestoNodeList2(_relation.nodeList2);
-          } else {
-            element.push(_relation);
-            classify = true;
-          }
-        }
-      } else {
-        this.relations[_relation.type.get()].addNotExistingVerticestoRelation(
-          _relation
-        );
-      }
-    } else {
-      if (_relation.isDirected.get()) {
-        let list = new Lst();
-        list.push(_relation);
-        this.relations.add_attr({
-          [name]: list
-        });
-        this._classifyRelation(_relation);
-      } else {
-        this.relations.add_attr({
-          [name]: _relation
-        });
-        classify = true;
-      }
-    }
-    if (classify) this._classifyRelation(_relation);
-  }
+  // addRelation2(_relation, _name) {
+  //   let classify = false;
+  //   let name = _relation.type.get();
+  //   if (typeof _name !== "undefined") {
+  //     name = _name;
+  //   }
+  //   if (typeof this.relations[_relation.type.get()] !== "undefined") {
+  //     if (_relation.isDirected.get()) {
+  //       for (
+  //         let index = 0; index < this.relations[_relation.type.get()].length; index++
+  //       ) {
+  //         const element = this.relations[_relation.type.get()][index];
+  //         if (
+  //           Utilities.arraysEqual(
+  //             _relation.getNodeList1Ids(),
+  //             element.getNodeList1Ids()
+  //           )
+  //         ) {
+  //           element.addNotExistingVerticestoNodeList2(_relation.nodeList2);
+  //         } else {
+  //           element.push(_relation);
+  //           classify = true;
+  //         }
+  //       }
+  //     } else {
+  //       this.relations[_relation.type.get()].addNotExistingVerticestoRelation(
+  //         _relation
+  //       );
+  //     }
+  //   } else {
+  //     if (_relation.isDirected.get()) {
+  //       let list = new Lst();
+  //       list.push(_relation);
+  //       this.relations.add_attr({
+  //         [name]: list
+  //       });
+  //       this._classifyRelation(_relation);
+  //     } else {
+  //       this.relations.add_attr({
+  //         [name]: _relation
+  //       });
+  //       classify = true;
+  //     }
+  //   }
+  //   if (classify) this._classifyRelation(_relation);
+  // }
 
+  /**
+   *
+   *
+   * @param {SpinalRelation} _relation
+   * @memberof SpinalNode
+   */
   _classifyRelation(_relation) {
     this.relatedGraph.load(relatedGraph => {
       relatedGraph._classifyRelation(_relation);
@@ -450,7 +466,12 @@ class SpinalNode extends globalType.Model {
   //     this.addRelation(_relations[index]);
   //   }
   // }
-
+  /**
+   *
+   *
+   * @returns all the relations of this Node
+   * @memberof SpinalNode
+   */
   getRelations() {
     let res = [];
     for (let i = 0; i < this.relations._attribute_names.length; i++) {
@@ -462,7 +483,13 @@ class SpinalNode extends globalType.Model {
     }
     return res;
   }
-
+  /**
+   *
+   *
+   * @param {string} type
+   * @returns all relations of a specific relation type
+   * @memberof SpinalNode
+   */
   getRelationsByType(type) {
     let res = [];
     if (!type.includes(">", type.length - 2) &&
@@ -480,7 +507,13 @@ class SpinalNode extends globalType.Model {
       type];
     return res;
   }
-
+  /**
+   *
+   *
+   * @param {string} appName
+   * @returns all relations of a specific app
+   * @memberof SpinalNode
+   */
   getRelationsByAppName(appName) {
     let res = [];
     if (this.hasAppDefined(appName)) {
@@ -489,15 +522,28 @@ class SpinalNode extends globalType.Model {
           index]];
         res.push(appRelation);
       }
-      return res;
-    } else return undefined
+    }
+    return res;
   }
-
+  /**
+   *
+   *
+   * @param {SpinalApplication} app
+   * @returns all relations of a specific app
+   * @memberof SpinalNode
+   */
   getRelationsByApp(app) {
     let appName = app.name.get()
     return this.getRelationsByAppName(appName)
   }
-
+  /**
+   *
+   *
+   * @param {string} appName
+   * @param {string} relationType
+   * @returns all relations of a specific app of a specific type
+   * @memberof SpinalNode
+   */
   getRelationsByAppNameByType(appName, relationType) {
     let res = [];
     if (this.hasRelationByAppByTypeDefined(appName, relationType)) {
@@ -506,18 +552,29 @@ class SpinalNode extends globalType.Model {
           index]];
         if (appRelation.type.get() === relationType) res.push(appRelation);
       }
-      return res;
-    } else {
-      return undefined
     }
+    return res;
   }
-
+  /**
+   *
+   *
+   * @param {SpinalApplication} app
+   * @param {string} relationType
+   * @returns all relations of a specific app of a specific type
+   * @memberof SpinalNode
+   */
   getRelationsByAppByType(app, relationType) {
     let appName = app.name.get()
     return this.getRelationsByAppNameByType(appName, relationType)
 
   }
-
+  /**
+   *  verify if an element is already in given nodeList
+   *
+   * @param {SpinalNode[]} _nodelist
+   * @returns boolean
+   * @memberof SpinalNode
+   */
   inNodeList(_nodelist) {
     for (let index = 0; index < _nodelist.length; index++) {
       const element = _nodelist[index];
@@ -527,10 +584,16 @@ class SpinalNode extends globalType.Model {
   }
 
   //TODO getChildren, getParent
-
-  getNeighbors(_type) {
+  /**
+   *
+   *
+   * @param {string} relationType - optional
+   * @returns a list of neighbors nodes 
+   * @memberof SpinalNode
+   */
+  getNeighbors(relationType) {
     let neighbors = [];
-    let relations = this.getRelations(_type);
+    let relations = this.getRelations(relationType);
     for (let index = 0; index < relations.length; index++) {
       const relation = relations[index];
       if (relation.isDirected.get()) {

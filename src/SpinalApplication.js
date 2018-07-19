@@ -226,7 +226,7 @@ class SpinalApplication extends globalType.Model {
   /**
    *
    *
-   * @returns  all BIMElement or AbstractElement (in NodeList1)
+   * @returns  A promise of all BIMElement or AbstractElement (in NodeList1)
    * @memberof SpinalApplication
    */
   async getCenralNodesElements() {
@@ -236,13 +236,13 @@ class SpinalApplication extends globalType.Model {
       const centralNode = centralNodes[index];
       res.push(await Utilities.promiseLoad(centralNode.element))
     }
-    return;
+    return res;
   }
   /**
    *
    *
    * @param {string} relationType
-   * @returns all BIMElement or AbstractElement (in NodeList1) of a sepcific type
+   * @returns A promise of all BIMElement or AbstractElement (in NodeList1) of a specific type
    * @memberof SpinalApplication
    */
   async getCenralNodesElementsByRelationType(relationType) {
@@ -252,7 +252,7 @@ class SpinalApplication extends globalType.Model {
       const centralNode = centralNodes[index];
       res.push(await Utilities.promiseLoad(centralNode.element))
     }
-    return;
+    return res;
   }
 
 
@@ -260,7 +260,7 @@ class SpinalApplication extends globalType.Model {
    *
    *
    * @param {SpinalNode} node
-   * @returns all elements of (nodeList2) associated with a specific (central)node
+   * @returns A promise of all elements of (nodeList2) associated with a specific (central)node
    * @memberof SpinalApplication
    */
   async getAssociatedElementsByNode(node) {
@@ -281,7 +281,7 @@ class SpinalApplication extends globalType.Model {
    *
    * @param {SpinalNode} node
    * @param {string} relationType
-   * @returns all elements of (nodeList2) associated with a specific (central)node by a specific relation type
+   * @returns A promise of all elements of (nodeList2) associated with a specific (central)node by a specific relation type
    * @memberof SpinalApplication
    */
   async getAssociatedElementsByNodeByRelationType(node, relationType) {

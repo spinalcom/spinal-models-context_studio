@@ -139,12 +139,12 @@ returns the nodes of the system such as BIMElementNodes
 
 ### spinalApplication.getCenralNodesElements() ⇒
 **Kind**: instance method of [<code>SpinalApplication</code>](#SpinalApplication)  
-**Returns**: all BIMElement or AbstractElement (in NodeList1)  
+**Returns**: A promise of all BIMElement or AbstractElement (in NodeList1)  
 <a name="SpinalApplication+getCenralNodesElementsByRelationType"></a>
 
 ### spinalApplication.getCenralNodesElementsByRelationType(relationType) ⇒
 **Kind**: instance method of [<code>SpinalApplication</code>](#SpinalApplication)  
-**Returns**: all BIMElement or AbstractElement (in NodeList1) of a sepcific type  
+**Returns**: A promise of all BIMElement or AbstractElement (in NodeList1) of a specific type  
 
 | Param | Type |
 | --- | --- |
@@ -154,7 +154,7 @@ returns the nodes of the system such as BIMElementNodes
 
 ### spinalApplication.getAssociatedElementsByNode(node) ⇒
 **Kind**: instance method of [<code>SpinalApplication</code>](#SpinalApplication)  
-**Returns**: all elements of (nodeList2) associated with a specific (central)node  
+**Returns**: A promise of all elements of (nodeList2) associated with a specific (central)node  
 
 | Param | Type |
 | --- | --- |
@@ -164,7 +164,7 @@ returns the nodes of the system such as BIMElementNodes
 
 ### spinalApplication.getAssociatedElementsByNodeByRelationType(node, relationType) ⇒
 **Kind**: instance method of [<code>SpinalApplication</code>](#SpinalApplication)  
-**Returns**: all elements of (nodeList2) associated with a specific (central)node by a specific relation type  
+**Returns**: A promise of all elements of (nodeList2) associated with a specific (central)node by a specific relation type  
 
 | Param | Type |
 | --- | --- |
