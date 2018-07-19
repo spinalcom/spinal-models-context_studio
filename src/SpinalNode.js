@@ -8,20 +8,35 @@ let getViewer = function() {
 import {
   Utilities
 } from "./Utilities";
-
-export default class SpinalNode extends globalType.Model {
-  constructor(_name, _element, _graph, _relations, name = "SpinalNode") {
+/**
+ *
+ *
+ * @export
+ * @class SpinalNode
+ * @extends {Model}
+ */
+class SpinalNode extends globalType.Model {
+  /**
+   *Creates an instance of SpinalNode.
+   * @param {string} name
+   * @param {Model} element - any subClass of Model
+   * @param {SpinalGraph} relatedGraph
+   * @param {SpinalRelation[]} relations
+   * @param {string} [name="SpinalNode"]
+   * @memberof SpinalNode
+   */
+  constructor(_name, element, relatedGraph, relations, name = "SpinalNode") {
     super();
     if (FileSystem._sig_server) {
       this.add_attr({
         name: _name,
-        element: new Ptr(_element),
+        element: new Ptr(element),
         relations: new Model(),
         apps: new Model(),
-        graph: _graph
+        relatedGraph: relatedGraph
       });
-      if (typeof this.graph !== "undefined") {
-        this.graph.classifyNode(this);
+      if (typeof this.relatedGraph !== "undefined") {
+        this.relatedGraph.classifyNode(this);
       }
       if (typeof _relations !== "undefined") {
         if (Array.isArray(_relations) || _relations instanceof Lst)
@@ -36,59 +51,106 @@ export default class SpinalNode extends globalType.Model {
   //     [app.name.get()]: new Ptr(app)
   //   })
   // }
-
+  /**
+   *
+   *
+   * @returns all applications names as string
+   * @memberof SpinalNode
+   */
   getAppsNames() {
     return this.apps._attribute_names;
   }
-
-  getApps() {
+  /**
+   *
+   *
+   * @returns all applications
+   * @memberof SpinalNode
+   */
+  async getApps() {
     let res = []
     for (let index = 0; index < this.apps._attribute_names.length; index++) {
       const appName = this.apps._attribute_names[index];
-      res.push(this.graph.appsList[appName])
+      res.push(await Utilities.promiseLoad(this.relatedGraph.appsList[
+        appName]))
     }
     return res;
   }
-
-  changeDefaultRelation(relationType, relation, asParent) {
-    if (relation.isDirected.get()) {
-      if (asParent) {
-        Utilities.putOnTopLst(this.relations[relationType + "<"], relation);
-      } else {
-        Utilities.putOnTopLst(this.relations[relationType + ">"], relation);
-      }
-    } else {
-      Utilities.putOnTopLst(this.relations[relationType + "-"], relation);
-    }
-  }
-
+  // /**
+  //  *
+  //  *
+  //  * @param {*} relationType
+  //  * @param {*} relation
+  //  * @param {*} asParent
+  //  * @memberof SpinalNode
+  //  */
+  // changeDefaultRelation(relationType, relation, asParent) {
+  //     if (relation.isDirected.get()) {
+  //       if (asParent) {
+  //         Utilities.putOnTopLst(this.relations[relationType + ">"], relation);
+  //       } else {
+  //         Utilities.putOnTopLst(this.relations[relationType + "<"], relation);
+  //       }
+  //     } else {
+  //       Utilities.putOnTopLst(this.relations[relationType + "-"], relation);
+  //     }
+  //   }
+  /**
+   *
+   *
+   * @returns boolean
+   * @memberof SpinalNode
+   */
   hasRelation() {
     return this.relations.length !== 0;
   }
-
+  /**
+   *
+   *
+   * @param {SpinalRelation} relation
+   * @param {string} appName
+   * @memberof SpinalNode
+   */
   addDirectedRelationParent(relation, appName) {
-    let name = relation.type.get();
-    name = name.concat("<");
-    if (typeof appName === "undefined") this.addRelation(relation, name);
-    else this.addRelationByApp(relation, name, appName);
-  }
-
-  addDirectedRelationChild(relation, appName) {
     let name = relation.type.get();
     name = name.concat(">");
     if (typeof appName === "undefined") this.addRelation(relation, name);
     else this.addRelationByApp(relation, name, appName);
   }
-
+  /**
+   *
+   *
+   * @param {SpinalRelation} relation
+   * @param {string} appName
+   * @memberof SpinalNode
+   */
+  addDirectedRelationChild(relation, appName) {
+    let name = relation.type.get();
+    name = name.concat("<");
+    if (typeof appName === "undefined") this.addRelation(relation, name);
+    else this.addRelationByApp(relation, name, appName);
+  }
+  /**
+   *
+   *
+   * @param {SpinalRelation} relation
+   * @param {string} appName
+   * @memberof SpinalNode
+   */
   addNonDirectedRelation(relation, appName) {
     let name = relation.type.get();
     name = name.concat("-");
     if (typeof appName === "undefined") this.addRelation(relation, name);
     else this.addRelationByApp(relation, name, appName);
   }
-
+  /**
+   *
+   *
+   * @param {SpinalRelation} relation
+   * @param {string} name
+   * @memberof SpinalNode
+   */
   addRelation(relation, name) {
-    if (!this.graph.isReserved(relation.type.get())) {
+    if (!this.relatedGraph.isReserved(relation.type.get())) {
       let nameTmp = relation.type.get();
       if (typeof name !== "undefined") {
         nameTmp = name;
@@ -106,14 +168,22 @@ export default class SpinalNode extends globalType.Model {
       console.log(
         relation.type.get() +
         " is reserved by " +
-        this.graph.reservedRelationsNames[relation.type.get()]
+        this.relatedGraph.reservedRelationsNames[relation.type.get()]
       );
     }
   }
-
+  /**
+   *
+   *
+   * @param {SpinalRelation} relation
+   * @param {string} name -relation Name if not organilly defined
+   * @param {string} appName
+   * @memberof SpinalNode
+   */
   addRelationByApp(relation, name, appName) {
-    if (this.graph.hasReservationCredentials(relation.type.get(), appName)) {
-      if (this.graph.containsApp(appName)) {
+    if (this.relatedGraph.hasReservationCredentials(relation.type.get(),
+        appName)) {
+      if (this.relatedGraph.containsApp(appName)) {
         let nameTmp = relation.type.get();
         if (typeof name !== "undefined") {
           nameTmp = name;
@@ -147,34 +217,51 @@ export default class SpinalNode extends globalType.Model {
       console.log(
         relation.type.get() +
         " is reserved by " +
-        this.graph.reservedRelationsNames[relation.type.get()]
+        this.relatedGraph.reservedRelationsNames[relation.type.get()]
       );
     }
   }
-
+  /**
+   *
+   *
+   * @param {string} relationType
+   * @param {Model} element - and subClass of Model
+   * @param {boolean} [isDirected=false]
+   * @returns
+   * @memberof SpinalNode
+   */
   addSimpleRelation(relationType, element, isDirected = false) {
-    if (!this.graph.isReserved(relationType)) {
-      let node2 = this.graph.addNode(element);
+    if (!this.relatedGraph.isReserved(relationType)) {
+      let node2 = this.relatedGraph.addNode(element);
       let rel = new SpinalRelation(relationType, [this], [node2],
         isDirected);
-      this.graph.addRelation(rel);
+      this.relatedGraph.addRelation(rel);
       return rel;
     } else {
       console.log(
         relationType +
         " is reserved by " +
-        this.graph.reservedRelationsNames[relationType]
+        this.relatedGraph.reservedRelationsNames[relationType]
       );
     }
   }
-
+  /**
+   *
+   *
+   * @param {string} appName
+   * @param {string} relationType
+   * @param {Model} element
+   * @param {boolean} [isDirected=false]
+   * @returns the created relation
+   * @memberof SpinalNode
+   */
   addSimpleRelationByApp(appName, relationType, element, isDirected = false) {
-    if (this.graph.hasReservationCredentials(relationType, appName)) {
-      if (this.graph.containsApp(appName)) {
-        let node2 = this.graph.addNode(element);
+    if (this.relatedGraph.hasReservationCredentials(relationType, appName)) {
+      if (this.relatedGraph.containsApp(appName)) {
+        let node2 = this.relatedGraph.addNode(element);
         let rel = new SpinalRelation(relationType, [this], [node2],
           isDirected);
-        this.graph.addRelation(rel, appName);
+        this.relatedGraph.addRelation(rel, appName);
         return rel;
       } else {
         console.error(appName + " does not exist");
@@ -183,19 +270,28 @@ export default class SpinalNode extends globalType.Model {
       console.log(
         relationType +
         " is reserved by " +
-        this.graph.reservedRelationsNames[relationType]
+        this.relatedGraph.reservedRelationsNames[relationType]
       );
     }
   }
-
+  /**
+   *
+   *
+   * @param {*} relationType
+   * @param {*} element
+   * @param {boolean} [isDirected=false]
+   * @param {boolean} [asParent=false]
+   * @returns
+   * @memberof SpinalNode
+   */
   addToExistingRelation(
     relationType,
     element,
     isDirected = false,
     asParent = false
   ) {
-    if (!this.graph.isReserved(relationType)) {
-      let node2 = this.graph.addNode(element);
+    if (!this.relatedGraph.isReserved(relationType)) {
+      let node2 = this.relatedGraph.addNode(element);
       let existingRelations = this.getRelations();
       for (let index = 0; index < existingRelations.length; index++) {
         const relation = existingRelations[index];
@@ -226,7 +322,7 @@ export default class SpinalNode extends globalType.Model {
       console.log(
         relationType +
         " is reserved by " +
-        this.graph.reservedRelationsNames[relationType]
+        this.relatedGraph.reservedRelationsNames[relationType]
       );
     }
   }
@@ -238,9 +334,9 @@ export default class SpinalNode extends globalType.Model {
     isDirected = false,
     asParent = false
   ) {
-    if (this.graph.hasReservationCredentials(relationType, appName)) {
-      if (this.graph.containsApp(appName)) {
-        let node2 = this.graph.addNode(element);
+    if (this.relatedGraph.hasReservationCredentials(relationType, appName)) {
+      if (this.relatedGraph.containsApp(appName)) {
+        let node2 = this.relatedGraph.addNode(element);
         if (typeof this.apps[appName] !== "undefined") {
           let appRelations = this.getRelationsByAppName(appName);
           for (let index = 0; index < appRelations.length; index++) {
@@ -280,7 +376,7 @@ export default class SpinalNode extends globalType.Model {
       console.log(
         relationType +
         " is reserved by " +
-        this.graph.reservedRelationsNames[relationType]
+        this.relatedGraph.reservedRelationsNames[relationType]
       );
     }
   }
@@ -336,16 +432,16 @@ export default class SpinalNode extends globalType.Model {
   }
 
   _classifyRelation(_relation) {
-    this.graph.load(graph => {
-      graph._classifyRelation(_relation);
+    this.relatedGraph.load(relatedGraph => {
+      relatedGraph._classifyRelation(_relation);
     });
   }
 
   //TODO :NotWorking
   // addRelation(_relation) {
   //   this.addRelation(_relation)
-  //   this.graph.load(graph => {
-  //     graph._addNotExistingVerticesFromRelation(_relation)
+  //   this.relatedGraph.load(relatedGraph => {
+  //     relatedGraph._addNotExistingVerticesFromRelation(_relation)
   //   })
   // }
   //TODO :NotWorking
@@ -532,5 +628,5 @@ export default class SpinalNode extends globalType.Model {
     return element.toIfc();
   }
 }
-
+export default SpinalNode
 spinalCore.register_models([SpinalNode]);

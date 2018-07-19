@@ -5,6 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "createDoc": "./createDoc.sh",
     "build": "babel src -d  build -s inline"
   },
   "repository": {

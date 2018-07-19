@@ -23,6 +23,13 @@ export default class SpinalRelation extends globalType.Model {
     }
   }
 
+  getNodeList1() {
+    return this.nodeList1;
+  }
+
+  getNodeList2() {
+    return this.nodeList2;
+  }
   getNodeList1Ids() {
     let t = []
     for (let index = 0; index < this.nodeList1.length; index++) {

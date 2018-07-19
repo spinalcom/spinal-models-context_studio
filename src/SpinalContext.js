@@ -8,21 +8,38 @@ import {
   Utilities
 } from "./Utilities"
 
-export default class SpinalContext extends globalType.Model {
-  constructor(_name, _usedRelations, _startingNode, _usedGraph, name =
+import
+SpinalApplication
+from "./SpinalApplication"
+
+/**
+ *
+ *
+ * @class SpinalContext
+ * @extends {SpinalApplication}
+ */
+
+
+class SpinalContext extends SpinalApplication {
+  /**
+   *Creates an instance of SpinalContext.
+   * @param {string} name
+   * @param {string[]} relationsTypesLst
+   * @param {SpinalGraph} relatedGraph
+   * @param {SpinaNode} startingNode
+   * @param {string} [name="SpinalContext"]
+   * @memberof SpinalContext
+   */
+  constructor(_name, relationsTypesLst, relatedGraph, startingNode, name =
     "SpinalContext") {
-    super();
+    super(_name, relationsTypesLst, relatedGraph);
     if (FileSystem._sig_server) {
       this.add_attr({
-        id: Utilities.guid(this.constructor.name),
-        name: _name || "",
-        usedRelations: _usedRelations || new Lst(),
-        startingNode: _startingNode,
-        usedGraph: _usedGraph,
+        startingNode: startingNode || new Ptr(0),
         contextImage: new Lst()
       });
     }
   }
 }
-
+export default SpinalContext;
 spinalCore.register_models([SpinalContext]);

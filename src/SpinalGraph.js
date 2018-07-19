@@ -4,23 +4,25 @@ import SpinalNode from "./SpinalNode";
 import SpinalRelation from "./SpinalRelation";
 import AbstractElement from "./AbstractElement";
 import BIMElement from "./BIMElement";
-import SpinalContext from "./SpinalContext";
 import SpinalApplication from "./SpinalApplication";
+import SpinalContext from "./SpinalContext";
 
 import {
   Utilities
 } from "./Utilities";
 /**
  * The core of the interactions between the BIMElements Nodes and other Nodes(Docs, Tickets, etc ..)
+ * @class SpinalGraph
+ * @extends {Model}
  */
-class Graph extends globalType.Model {
+class SpinalGraph extends globalType.Model {
   /**
-   *Creates an instance of Graph.
+   *Creates an instance of SpinalGraph.
    * @param {string} [_name=t]
    * @param {Ptr} [_startingNode=new Ptr(0)]
-   * @memberof Graph
+   * @memberof SpinalGraph
    */
-  constructor(_name = "t", _startingNode = new Ptr(0), name = "Graph") {
+  constructor(_name = "t", _startingNode = new Ptr(0), name = "SpinalGraph") {
     super();
     if (FileSystem._sig_server) {
       this.add_attr({
@@ -32,15 +34,15 @@ class Graph extends globalType.Model {
         nodeListByElementType: new Model(),
         relationList: new Ptr(new Lst()),
         relationListByType: new Model(),
-        contextList: new Lst(),
         appsList: new Model(),
+        appsListByType: new Model(),
         reservedRelationsNames: new Model()
       });
     }
   }
   /**
    *function
-   *To put used functions as well as the graph model in the global scope
+   *To put used functions as well as the SpinalGraph model in the global scope
    */
   init() {
     globalType.spinal.contextStudio = {};
@@ -56,7 +58,7 @@ class Graph extends globalType.Model {
    *
    * @param {number} _dbId
    * @returns Promise of the corresponding Node or the created one if not existing
-   * @memberof Graph
+   * @memberof SpinalGraph
    */
   async getNodeBydbId(_dbId) {
     let _externalId = await Utilities.getExternalId(_dbId);
@@ -76,7 +78,7 @@ class Graph extends globalType.Model {
    *
    *
    * @param {SpinalNode} _node
-   * @memberof Graph
+   * @memberof SpinalGraph
    */
   async _classifyBIMElementNode(_node) {
     //TODO DELETE OLD CLASSIFICATION
@@ -87,7 +89,7 @@ class Graph extends globalType.Model {
    *
    * @param {SpinalNode} _node
    * @returns Promise of dbId [number]
-   * @memberof Graph
+   * @memberof SpinalGraph
    */
   async getDbIdByNode(_node) {
     let element = await Utilities.promiseLoad(_node.element);
@@ -99,7 +101,7 @@ class Graph extends globalType.Model {
    *
    *
    * @param {string} _name
-   * @memberof Graph
+   * @memberof SpinalGraph
    */
   setName(_name) {
     this.name.set(_name);
@@ -108,7 +110,7 @@ class Graph extends globalType.Model {
    *
    *
    * @param {Ptr} _startingNode
-   * @memberof Graph
+   * @memberof SpinalGraph
    */
   setStartingNode(_startingNode) {
     this.startingNode.set(_startingNode);
@@ -118,7 +120,7 @@ class Graph extends globalType.Model {
    *
    * @param {number} _ElementId - the Element ExternalId
    * @param {SpinalNode} _node
-   * @memberof Graph
+   * @memberof SpinalGraph
    */
   async _addExternalIdNodeMappingEntry(_ElementId, _node) {
     let _dbid = _ElementId.get();
@@ -142,7 +144,7 @@ class Graph extends globalType.Model {
    *
    * @param {Model} _element - any subClass of Model
    * @returns Promise of the created Node
-   * @memberof Graph
+   * @memberof SpinalGraph
    */
   async addNodeAsync(_element) {
     let name = "";
@@ -175,7 +177,7 @@ class Graph extends globalType.Model {
    *
    * @param {Model} _element - any subClass of Model
    * @returns the created Node
-   * @memberof Graph
+   * @memberof SpinalGraph
    */
   addNode(_element) {
     let name = "";
@@ -210,11 +212,13 @@ class Graph extends globalType.Model {
    * It adds the node to the mapping list with ExternalId if the Object is of type BIMElement
    *
    * @param {SpinalNode} _node
-   * @memberof Graph
+   * @memberof SpinalGraph
    */
   classifyNode(_node) {
     Utilities.promiseLoad(_node.element).then(element => {
-      if (typeof _node.graph === "undefined") _node.graph.set(this);
+      if (typeof _node.relatedGraph === "undefined") _node.relatedGraph
+        .set(
+          this);
       this.nodeList.load(nodeList => {
         nodeList.push(_node);
       });
@@ -267,7 +271,7 @@ class Graph extends globalType.Model {
    * @param {Model} _element - any subClass of Model
    * @param {boolean} [_isDirected=false]
    * @returns a Promise of the created relation
-   * @memberof Graph
+   * @memberof SpinalGraph
    */
   async addSimpleRelationAsync(
     _relationType,
@@ -301,7 +305,7 @@ class Graph extends globalType.Model {
    * @param {Model} element - any subClass of Model
    * @param {boolean} [isDirected=false]
    * @returns a Promise of the created relation
-   * @memberof Graph
+   * @memberof SpinalGraph
    */
   addSimpleRelation(relationType, node, element, isDirected = false) {
     if (!this.isReserved(_relationType)) {
@@ -318,7 +322,17 @@ class Graph extends globalType.Model {
       );
     }
   }
-
+  /**
+   *
+   *
+   * @param {string} appName
+   * @param {string} relationType
+   * @param {SpinalNode} node
+   * @param {Model} element - any subClass of Model
+   * @param {boolean} [isDirected=false]
+   * @returns the created Relation, undefined otherwise
+   * @memberof SpinalGraph
+   */
   addSimpleRelationByApp(
     appName,
     relationType,
@@ -344,7 +358,13 @@ class Graph extends globalType.Model {
       );
     }
   }
-
+  /**
+   *
+   *
+   * @param {SpinalRelation} relation
+   * @param {string} appName
+   * @memberof SpinalGraph
+   */
   addRelation(relation, appName) {
     if (this.hasReservationCredentials(relation.type.get(), appName)) {
       if (relation.isDirected.get()) {
@@ -378,8 +398,8 @@ class Graph extends globalType.Model {
   /**
    *
    *
-   * @param {SpinalRelations} _relations
-   * @memberof Graph
+   * @param {SpinalRelation[]} _relations
+   * @memberof SpinalGraph
    */
   addRelations(_relations) {
     for (let index = 0; index < _relations.length; index++) {
@@ -387,7 +407,13 @@ class Graph extends globalType.Model {
       this.addRelation(relation);
     }
   }
-
+  /**
+   *
+   *
+   * @param {Spinalrelation} relation
+   * @param {string} appName
+   * @memberof SpinalGraph
+   */
   _classifyRelation(relation, appName) {
     this.relationList.load(relationList => {
       relationList.push(relation);
@@ -404,23 +430,45 @@ class Graph extends globalType.Model {
       });
     }
     if (typeof appName !== "undefined") {
-      if (
-        typeof this.appsList[appName][relation.type.get()] ===
-        "undefined"
-      ) {
-        this.appsList[appName].addRelation(relation)
-      }
+      if (this.containsApp(appName))
+        this.appsList[appName].load(app => {
+          if (
+            typeof app[relation.type.get()] ===
+            "undefined"
+          ) {
+            app.addRelation(relation)
+          }
+        })
     }
   }
-
+  /**
+   *checks if this graph contains contains a specific App
+   *
+   * @param {string} appName
+   * @returns Boolean
+   * @memberof SpinalGraph
+   */
   containsApp(appName) {
     return typeof this.appsList[appName] !== "undefined";
   }
-
+  /**
+   *
+   *
+   * @param {string} relationType
+   * @returns boolean
+   * @memberof SpinalGraph
+   */
   isReserved(relationType) {
     return typeof this.reservedRelationsNames[relationType] !== "undefined";
   }
-
+  /**
+   *  checks if the app has the right to use a reserved relation
+   *
+   * @param {string} relationType
+   * @param {string} appName
+   * @returns boolean
+   * @memberof SpinalGraph
+   */
   hasReservationCredentials(relationType, appName) {
     return (!this.isReserved(relationType) ||
       (this.isReserved(relationType) &&
@@ -431,7 +479,7 @@ class Graph extends globalType.Model {
    *
    *
    * @param {SpinalRelations} relations
-   * @memberof Graph
+   * @memberof SpinalGraph
    */
   _classifyRelations(_relations) {
     for (let index = 0; index < _relations.length; index++) {
@@ -441,8 +489,8 @@ class Graph extends globalType.Model {
   /**
    *
    *
-   * @param {Lst} _list
-   * @memberof Graph
+   * @param {SpinalNode[]} _list
+   * @memberof SpinalGraph
    */
   _addNotExistingNodesFromList(_list) {
     this.nodeList.load(nodeList => {
@@ -457,47 +505,98 @@ class Graph extends globalType.Model {
   /**
    *
    *
-   * @param {SpinalRelations} _relation
-   * @memberof Graph
+   * @param {SpinalRelation[]} _relation
+   * @memberof SpinalGraph
    */
   _addNotExistingNodesFromRelation(_relation) {
     this._addNotExistingNodesFromList(_relation.nodeList1);
     this._addNotExistingNodesFromList(_relation.nodeList2);
   }
+
+
+  // async getAllContexts() {
+  //   let res = []
+  //   for (let index = 0; index < this.appsList._attribute_names.length; index++) {
+  //     let key = this.appsList._attribute_names[index]
+  //     if (key.includes("_C", key.length - 2)) {
+  //       const context = this.appsList[key];
+  //       res.push(await Utilities.promiseLoad(context))
+  //     }
+
+  //   }
+  //   return res;
+  // }
   /**
    *
    *
-   * @param {string} _name
-   * @param {strings} _usedRelations
-   * @param {SpinalNode} _startingNode
-   * @param {Graph} [_usedGraph=this]
-   * @returns The created Context
-   * @memberof Graph
+   * @param {string} appType
+   * @returns all Apps of a specific type
+   * @memberof SpinalGraph
    */
-  addContext(_name, _usedRelations, _startingNode, _usedGraph = this) {
-    let context = new SpinalContext(
-      _name,
-      _usedRelations,
-      _startingNode,
-      _usedGraph
-    );
-    this.contextList.push(context);
-    return context;
+  async getAppsByType(appType) {
+    if (typeof this.appsListByType[appType] !== "undefined")
+      return await Utilities.promiseLoad(this.appsListByType[appType])
   }
 
-  getApp(name, relationsTypesLst, relatedGraph = this) {
+
+
+  /**
+   *
+   *
+   * @param {string} name
+   * @param {string[]} relationsTypesLst
+   * @param {SpinalGraph} [relatedGraph=this]
+   * @param {Ptr} startingNode
+   * @returns A promise of the created Context
+   * @memberof SpinalGraph
+   */
+  async getContext(name, relationsTypesLst, relatedGraph = this,
+    startingNode, ) {
+    if (typeof this.appsList[name] === "undefined") {
+      let context = new SpinalContext(
+        name,
+        relationsTypesLst,
+        relatedGraph,
+        startingNode
+      );
+      this.appsList.add_attr({
+        [name]: new Ptr(context)
+      });
+      if (typeof this.appsListByType.context === "undefined") {
+        this.appsListByType.add_attr({
+          context: new Ptr(new Lst([context]))
+        });
+      } else {
+        let contextList = await Utilities.promiseLoad(this.appsListByType.context)
+        contextList.push(context)
+      }
+      return context;
+    } else {
+      return await Utilities.promiseLoad(this.appsList[name])
+    }
+  }
+  /**
+   *
+   *
+   * @param {string} name
+   * @param {string[]} relationsTypesLst
+   * @param {SpinalGraph} [relatedSpinalGraph=this]
+   * @returns A promise of the created App
+   * @memberof SpinalGraph
+   */
+  async getApp(name, relationsTypesLst, relatedSpinalGraph = this) {
     if (typeof this.appsList[name] === "undefined") {
       let spinalApplication = new SpinalApplication(
         name,
         relationsTypesLst,
-        relatedGraph
+        relatedSpinalGraph
       );
       this.appsList.add_attr({
-        [name]: spinalApplication
+        [name]: new Ptr(spinalApplication)
       });
       return spinalApplication;
     } else {
-      return this.appsList[name]
+      return await Utilities.promiseLoad(this.appsList[name])
       // console.error(
       //   name +
       //   " as well as " +
@@ -507,10 +606,23 @@ class Graph extends globalType.Model {
     }
   }
 
+  /**
+   *
+   *
+   * @returns an array of apps names
+   * @memberof SpinalGraph
+   */
   getAppsNames() {
-    this.appsList._attribute_names;
+    return this.appsList._attribute_names;
   }
-
+  /**
+   *
+   *
+   * @param {string} relationType
+   * @param {SpinalApplication} app
+   * @returns boolean
+   * @memberof SpinalGraph
+   */
   reserveUniqueRelationType(relationType, app) {
     if (
       typeof this.reservedRelationsNames[relationType] === "undefined" &&
@@ -532,7 +644,8 @@ class Graph extends globalType.Model {
         this.reservedRelationsNames[relationType]
       );
       return false;
-    } else if (typeof this.relationListByType[relationType] !== "undefined") {
+    } else if (typeof this.relationListByType[relationType] !==
+      "undefined") {
       console.error(
         relationType +
         " has not been added to app: " +
@@ -543,5 +656,5 @@ class Graph extends globalType.Model {
   }
 }
 
-export default Graph;
-spinalCore.register_models([Graph]);
+export default SpinalGraph;
+spinalCore.register_models([SpinalGraph]);
