@@ -19,7 +19,7 @@ class SpinalNode extends globalType.Model {
   /**
    *Creates an instance of SpinalNode.
    * @param {string} name
-   * @param {Model} element - any subClass of Model
+   * @param {Model} element - any subclass of Model
    * @param {SpinalGraph} relatedGraph
    * @param {SpinalRelation[]} relations
    * @param {string} [name="SpinalNode"]
@@ -225,7 +225,7 @@ class SpinalNode extends globalType.Model {
    *
    *
    * @param {string} relationType
-   * @param {Model} element - and subClass of Model
+   * @param {Model} element - and subclass of Model
    * @param {boolean} [isDirected=false]
    * @returns the created relation, undefined otherwise
    * @memberof SpinalNode
@@ -278,7 +278,7 @@ class SpinalNode extends globalType.Model {
    *
    *
    * @param {string} relationType
-   * @param {Model} element - any subClass of Model
+   * @param {Model} element - any subclass of Model
    * @param {boolean} [isDirected=false]
    * @param {boolean} [asParent=false]
    * @returns the relation with the added element node in (nodeList2)
@@ -331,7 +331,7 @@ class SpinalNode extends globalType.Model {
    *
    * @param {string} appName
    * @param {string} relationType
-   * @param {Model} element - any subClass of Model
+   * @param {Model} element - any subclass of Model
    * @param {boolean} [isDirected=false]
    * @param {boolean} [asParent=false]
    * @returns the relation with the added element node in (nodeList2)
@@ -613,7 +613,12 @@ class SpinalNode extends globalType.Model {
     }
     return neighbors;
   }
-
+  /**
+   *
+   *
+   * @param {SpinalRelation} _relation
+   * @memberof SpinalNode
+   */
   removeRelation(_relation) {
     let relationLst = this.relations[_relation.type.get()];
     for (let index = 0; index < relationLst.length; index++) {
@@ -622,24 +627,40 @@ class SpinalNode extends globalType.Model {
         relationLst.splice(index, 1);
     }
   }
-
+  /**
+   *
+   *
+   * @param {SpinalRelation[]} _relations
+   * @memberof SpinalNode
+   */
   removeRelations(_relations) {
     for (let index = 0; index < _relations.length; index++) {
       this.removeRelation(_relations[index]);
     }
   }
-
-  removeRelationType(_type) {
-    if (Array.isArray(_type) || _type instanceof Lst)
-      for (let index = 0; index < _type.length; index++) {
-        const type = _type[index];
+  /**
+   *
+   *
+   * @param {string} relationType
+   * @memberof SpinalNode
+   */
+  removeRelationType(relationType) {
+    if (Array.isArray(relationType) || relationType instanceof Lst)
+      for (let index = 0; index < relationType.length; index++) {
+        const type = relationType[index];
         this.relations.rem_attr(type);
       }
     else {
-      this.relations.rem_attr(_type);
+      this.relations.rem_attr(relationType);
     }
   }
-
+  /**
+   *
+   *
+   * @param {string} appName
+   * @returns boolean
+   * @memberof SpinalNode
+   */
   hasAppDefined(appName) {
     if (typeof this.apps[appName] !== "undefined")
       return true
@@ -649,7 +670,14 @@ class SpinalNode extends globalType.Model {
       return false
     }
   }
-
+  /**
+   *
+   *
+   * @param {string} appName
+   * @param {string} relationType
+   * @returns boolean 
+   * @memberof SpinalNode
+   */
   hasRelationByAppByTypeDefined(appName, relationType) {
     if (this.hasAppDefined(appName) && typeof this.apps[appName][
         relationType
@@ -663,7 +691,12 @@ class SpinalNode extends globalType.Model {
       return false
     }
   }
-
+  /**
+   *
+   *
+   * @returns A json representing the node
+   * @memberof SpinalNode
+   */
   toJson() {
     return {
       id: this.id.get(),
@@ -671,7 +704,12 @@ class SpinalNode extends globalType.Model {
       element: null
     };
   }
-
+  /**
+   *
+   *
+   * @returns A json representing the node with its relations
+   * @memberof SpinalNode
+   */
   toJsonWithRelations() {
     let relations = [];
     for (let index = 0; index < this.getRelations().length; index++) {
@@ -685,7 +723,12 @@ class SpinalNode extends globalType.Model {
       relations: relations
     };
   }
-
+  /**
+   *
+   *
+   * @returns An IFC like format representing the node
+   * @memberof SpinalNode
+   */
   async toIfc() {
     let element = await Utilities.promiseLoad(this.element);
     return element.toIfc();

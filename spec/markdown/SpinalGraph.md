@@ -115,7 +115,7 @@ To put used functions as well as the SpinalGraph model in the global scope
 
 | Param | Type | Description |
 | --- | --- | --- |
-| _element | <code>Model</code> | any subClass of Model |
+| _element | <code>Model</code> | any subclass of Model |
 
 <a name="SpinalGraph+addNode"></a>
 
@@ -125,7 +125,7 @@ To put used functions as well as the SpinalGraph model in the global scope
 
 | Param | Type | Description |
 | --- | --- | --- |
-| _element | <code>Model</code> | any subClass of Model |
+| _element | <code>Model</code> | any subclass of Model |
 
 <a name="SpinalGraph+classifyNode"></a>
 
@@ -153,7 +153,7 @@ then it creates a simple relation of class SpinalRelation of type:_type.
 | --- | --- | --- | --- |
 | _relationType | <code>string</code> |  |  |
 | _node | <code>SpinalNode</code> |  |  |
-| _element | <code>Model</code> |  | any subClass of Model |
+| _element | <code>Model</code> |  | any subclass of Model |
 | [_isDirected] | <code>boolean</code> | <code>false</code> |  |
 
 <a name="SpinalGraph+addSimpleRelation"></a>
@@ -169,7 +169,7 @@ then it creates a simple relation of class SpinalRelation of type:_type.
 | --- | --- | --- | --- |
 | relationType | <code>string</code> |  |  |
 | node | <code>SpinalNode</code> |  |  |
-| element | <code>Model</code> |  | any subClass of Model |
+| element | <code>Model</code> |  | any subclass of Model |
 | [isDirected] | <code>boolean</code> | <code>false</code> |  |
 
 <a name="SpinalGraph+addSimpleRelationByApp"></a>
@@ -183,7 +183,7 @@ then it creates a simple relation of class SpinalRelation of type:_type.
 | appName | <code>string</code> |  |  |
 | relationType | <code>string</code> |  |  |
 | node | <code>SpinalNode</code> |  |  |
-| element | <code>Model</code> |  | any subClass of Model |
+| element | <code>Model</code> |  | any subclass of Model |
 | [isDirected] | <code>boolean</code> | <code>false</code> |  |
 
 <a name="SpinalGraph+addRelation"></a>

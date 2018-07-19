@@ -142,7 +142,7 @@ class SpinalGraph extends globalType.Model {
   /**
    *
    *
-   * @param {Model} _element - any subClass of Model
+   * @param {Model} _element - any subclass of Model
    * @returns Promise of the created Node
    * @memberof SpinalGraph
    */
@@ -175,7 +175,7 @@ class SpinalGraph extends globalType.Model {
   /**
    *
    *
-   * @param {Model} _element - any subClass of Model
+   * @param {Model} _element - any subclass of Model
    * @returns the created Node
    * @memberof SpinalGraph
    */
@@ -268,7 +268,7 @@ class SpinalGraph extends globalType.Model {
    *
    * @param {string} _relationType
    * @param {SpinalNode} _node
-   * @param {Model} _element - any subClass of Model
+   * @param {Model} _element - any subclass of Model
    * @param {boolean} [_isDirected=false]
    * @returns a Promise of the created relation
    * @memberof SpinalGraph
@@ -302,7 +302,7 @@ class SpinalGraph extends globalType.Model {
    *
    * @param {string} relationType
    * @param {SpinalNode} node
-   * @param {Model} element - any subClass of Model
+   * @param {Model} element - any subclass of Model
    * @param {boolean} [isDirected=false]
    * @returns a Promise of the created relation
    * @memberof SpinalGraph
@@ -328,7 +328,7 @@ class SpinalGraph extends globalType.Model {
    * @param {string} appName
    * @param {string} relationType
    * @param {SpinalNode} node
-   * @param {Model} element - any subClass of Model
+   * @param {Model} element - any subclass of Model
    * @param {boolean} [isDirected=false]
    * @returns the created Relation, undefined otherwise
    * @memberof SpinalGraph
