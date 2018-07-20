@@ -30,6 +30,9 @@ import AbstractElement from "./AbstractElement"
 import BIMElement from "./BIMElement"
 import SpinalApplication from "./SpinalApplication"
 import SpinalContext from "./SpinalContext"
+import SpinalNetwork from "./SpinalNetwork"
+import SpinalDevice from "./SpinalDevice"
+import SpinalEndpoint from "./SpinalEndpoint"
 
 
 
@@ -44,5 +47,8 @@ export {
   AbstractElement,
   BIMElement,
   SpinalApplication,
-  SpinalContext
+  SpinalContext,
+  SpinalNetwork,
+  SpinalDevice,
+  SpinalEndpoint
 }

@@ -232,11 +232,14 @@ class SpinalNode extends globalType.Model {
    */
   addSimpleRelation(relationType, element, isDirected = false) {
     if (!this.relatedGraph.isReserved(relationType)) {
+      let res = {}
       let node2 = this.relatedGraph.addNode(element);
+      res.node = node2
       let rel = new SpinalRelation(relationType, [this], [node2],
         isDirected);
+      res.relation = rel
       this.relatedGraph.addRelation(rel);
-      return rel;
+      return res;
     } else {
       console.log(
         relationType +
@@ -258,11 +261,14 @@ class SpinalNode extends globalType.Model {
   addSimpleRelationByApp(appName, relationType, element, isDirected = false) {
     if (this.relatedGraph.hasReservationCredentials(relationType, appName)) {
       if (this.relatedGraph.containsApp(appName)) {
+        let res = {}
         let node2 = this.relatedGraph.addNode(element);
+        res.node = node2
         let rel = new SpinalRelation(relationType, [this], [node2],
           isDirected);
+        res.relation = rel
         this.relatedGraph.addRelation(rel, appName);
-        return rel;
+        return res;
       } else {
         console.error(appName + " does not exist");
       }
@@ -281,7 +287,7 @@ class SpinalNode extends globalType.Model {
    * @param {Model} element - any subclass of Model
    * @param {boolean} [isDirected=false]
    * @param {boolean} [asParent=false]
-   * @returns the relation with the added element node in (nodeList2)
+   * @returns an Object of 1)relation:the relation with the added element node in (nodeList2), 2)node: the created node
    * @memberof SpinalNode
    */
   addToExistingRelation(
@@ -290,34 +296,36 @@ class SpinalNode extends globalType.Model {
     isDirected = false,
     asParent = false
   ) {
+    let res = {}
     if (!this.relatedGraph.isReserved(relationType)) {
-      let node2 = this.relatedGraph.addNode(element);
       let existingRelations = this.getRelations();
       for (let index = 0; index < existingRelations.length; index++) {
         const relation = existingRelations[index];
+        res.relation = relation
         if (
           relationType === relationType &&
           isDirected === relation.isDirected.get()
         ) {
+          node2 = this.relatedGraph.addNode(element);
+          res.node = node2;
           if (isDirected) {
             if (asParent) {
               relation.addNodetoNodeList1(node2);
               node2.addDirectedRelationParent(relation);
-              return relation;
+              return res;
             } else {
               relation.addNodetoNodeList2(node2);
               node2.addDirectedRelationChild(relation);
-              return relation;
+              return res;
             }
           } else {
             relation.addNodetoNodeList2(node2);
             node2.addNonDirectedRelation(relation);
-            return relation;
+            return res;
           }
         }
       }
-      let rel = this.addSimpleRelation(relationType, element, isDirected);
-      return rel;
+      return this.addSimpleRelation(relationType, element, isDirected);
     } else {
       console.log(
         relationType +
@@ -334,7 +342,7 @@ class SpinalNode extends globalType.Model {
    * @param {Model} element - any subclass of Model
    * @param {boolean} [isDirected=false]
    * @param {boolean} [asParent=false]
-   * @returns the relation with the added element node in (nodeList2)
+   * @returns an Object of 1)relation:the relation with the added element node in (nodeList2), 2)node: the created node
    * @memberof SpinalNode
    */
   addToExistingRelationByApp(
@@ -344,42 +352,45 @@ class SpinalNode extends globalType.Model {
     isDirected = false,
     asParent = false
   ) {
+    let res = {}
+    let node2 = null
     if (this.relatedGraph.hasReservationCredentials(relationType, appName)) {
       if (this.relatedGraph.containsApp(appName)) {
-        let node2 = this.relatedGraph.addNode(element);
         if (typeof this.apps[appName] !== "undefined") {
           let appRelations = this.getRelationsByAppName(appName);
           for (let index = 0; index < appRelations.length; index++) {
             const relation = appRelations[index];
+            res.relation = relation
             if (
               relation.type.get() === relationType &&
               isDirected === relation.isDirected.get()
             ) {
+              node2 = this.relatedGraph.addNode(element);
+              res.node = node2;
               if (isDirected) {
                 if (asParent) {
                   relation.addNodetoNodeList1(node2);
                   node2.addDirectedRelationParent(relation, appName);
-                  return relation;
+                  return res;
                 } else {
                   relation.addNodetoNodeList2(node2);
                   node2.addDirectedRelationChild(relation, appName);
-                  return relation;
+                  return res;
                 }
               } else {
                 relation.addNodetoNodeList2(node2);
                 node2.addNonDirectedRelation(relation, appName);
-                return relation;
+                return res;
               }
             }
           }
         }
-        let rel = this.addSimpleRelationByApp(
+        return this.addSimpleRelationByApp(
           appName,
           relationType,
           element,
           isDirected
         );
-        return rel;
       } else {
         console.error(appName + " does not exist");
       }

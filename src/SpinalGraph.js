@@ -6,6 +6,9 @@ import AbstractElement from "./AbstractElement";
 import BIMElement from "./BIMElement";
 import SpinalApplication from "./SpinalApplication";
 import SpinalContext from "./SpinalContext";
+import SpinalNetwork from "./SpinalNetwork"
+import SpinalDevice from "./SpinalDevice"
+import SpinalEndpoint from "./SpinalEndpoint"
 
 import {
   Utilities
@@ -51,6 +54,9 @@ class SpinalGraph extends globalType.Model {
     globalType.spinal.contextStudio.SpinalRelation = SpinalRelation;
     globalType.spinal.contextStudio.AbstractElement = AbstractElement;
     globalType.spinal.contextStudio.BIMElement = BIMElement;
+    globalType.spinal.contextStudio.SpinalNetwork = SpinalNetwork;
+    globalType.spinal.contextStudio.SpinalDevice = SpinalDevice;
+    globalType.spinal.contextStudio.SpinalEndpoint = SpinalEndpoint;
     globalType.spinal.contextStudio.Utilities = Utilities;
   }
   /**
@@ -201,6 +207,8 @@ class SpinalGraph extends globalType.Model {
     }
     if (typeof _element.name !== "undefined") {
       name = _element.name.get();
+    } else {
+      name = _element.constructor.name;
     }
     let node = new SpinalNode(name, _element, this);
     return node;
