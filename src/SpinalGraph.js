@@ -6,9 +6,9 @@ import AbstractElement from "./AbstractElement";
 import BIMElement from "./BIMElement";
 import SpinalApplication from "./SpinalApplication";
 import SpinalContext from "./SpinalContext";
-import SpinalNetwork from "./SpinalNetwork"
-import SpinalDevice from "./SpinalDevice"
-import SpinalEndpoint from "./SpinalEndpoint"
+import SpinalNetwork from "./SpinalNetwork";
+import SpinalDevice from "./SpinalDevice";
+import SpinalEndpoint from "./SpinalEndpoint";
 
 import {
   Utilities
@@ -224,9 +224,8 @@ class SpinalGraph extends globalType.Model {
    */
   classifyNode(_node) {
     Utilities.promiseLoad(_node.element).then(element => {
-      if (typeof _node.relatedGraph === "undefined") _node.relatedGraph
-        .set(
-          this);
+      if (typeof _node.relatedGraph === "undefined")
+        _node.relatedGraph.set(this);
       this.nodeList.load(nodeList => {
         nodeList.push(_node);
       });
@@ -440,13 +439,10 @@ class SpinalGraph extends globalType.Model {
     if (typeof appName !== "undefined") {
       if (this.containsApp(appName))
         this.appsList[appName].load(app => {
-          if (
-            typeof app[relation.type.get()] ===
-            "undefined"
-          ) {
-            app.addRelation(relation)
+          if (typeof app[relation.type.get()] === "undefined") {
+            app.addRelation(relation);
           }
-        })
+        });
     }
   }
   /**
@@ -521,7 +517,6 @@ class SpinalGraph extends globalType.Model {
     this._addNotExistingNodesFromList(_relation.nodeList2);
   }
 
-
   // async getAllContexts() {
   //   let res = []
   //   for (let index = 0; index < this.appsList._attribute_names.length; index++) {
@@ -543,44 +538,53 @@ class SpinalGraph extends globalType.Model {
    */
   async getAppsByType(appType) {
     if (typeof this.appsListByType[appType] !== "undefined")
-      return await Utilities.promiseLoad(this.appsListByType[appType])
+      return await Utilities.promiseLoad(this.appsListByType[appType]);
   }
-
-
 
   /**
    *
    *
    * @param {string} name
    * @param {string[]} relationsTypesLst
+   * @param {Object[]} models
+   * @param {Model} [Interactions= new Model()]
+   * @param {SpinaNode} [startingNode = new SpinalNode(new AbstractElement(_name, "root"))]
    * @param {SpinalGraph} [relatedGraph=this]
-   * @param {Ptr} startingNode
    * @returns A promise of the created Context
    * @memberof SpinalGraph
    */
-  async getContext(name, relationsTypesLst, relatedGraph = this,
-    startingNode, ) {
+  async getContext(
+    name,
+    relationsTypesLst,
+    models,
+    Interactions,
+    startingNode,
+    relatedGraph = this
+  ) {
     if (typeof this.appsList[name] === "undefined") {
       let context = new SpinalContext(
         name,
         relationsTypesLst,
-        relatedGraph,
-        startingNode
+        models,
+        Interactions,
+        startingNode,
+        relatedGraph
       );
       this.appsList.add_attr({
         [name]: new Ptr(context)
       });
+
       if (typeof this.appsListByType.context === "undefined") {
         this.appsListByType.add_attr({
-          context: new Ptr(new Lst([context]))
+          context: new Model()
         });
-      } else {
-        let contextList = await Utilities.promiseLoad(this.appsListByType.context)
-        contextList.push(context)
       }
+      this.appsListByType.context.add_attr({
+        [name]: this.appsList[name]
+      });
       return context;
     } else {
-      return await Utilities.promiseLoad(this.appsList[name])
+      return await Utilities.promiseLoad(this.appsList[name]);
     }
   }
   /**
@@ -604,7 +608,7 @@ class SpinalGraph extends globalType.Model {
       });
       return spinalApplication;
     } else {
-      return await Utilities.promiseLoad(this.appsList[name])
+      return await Utilities.promiseLoad(this.appsList[name]);
       // console.error(
       //   name +
       //   " as well as " +
@@ -652,8 +656,7 @@ class SpinalGraph extends globalType.Model {
         this.reservedRelationsNames[relationType]
       );
       return false;
-    } else if (typeof this.relationListByType[relationType] !==
-      "undefined") {
+    } else if (typeof this.relationListByType[relationType] !== "undefined") {
       console.error(
         relationType +
         " has not been added to app: " +

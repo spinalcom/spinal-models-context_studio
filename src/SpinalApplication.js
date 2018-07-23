@@ -31,7 +31,7 @@ class SpinalApplication extends globalType.Model {
         type: "",
         relationsTypesLst: relationsTypesLst,
         relationsByType: new Model(),
-        realtionsLst: new Lst(),
+        relationsLst: new Lst(),
         relatedGraph: relatedGraph
       });
     }
@@ -74,7 +74,7 @@ class SpinalApplication extends globalType.Model {
    * @memberof SpinalApplication
    */
   getCharacteristicElement() {
-    return this.realtionsLst;
+    return this.relationsLst;
   }
   /**
    *
@@ -95,7 +95,7 @@ class SpinalApplication extends globalType.Model {
       } else {
         this.relationsByType[relation.type.get()].push(relation)
       }
-      this.realtionsLst.push(relation)
+      this.relationsLst.push(relation)
     } else {
       console.log(
         relation.type.get() +
@@ -159,7 +159,7 @@ class SpinalApplication extends globalType.Model {
    * @memberof SpinalApplication
    */
   getRelations() {
-    return this.realtionsLst;
+    return this.relationsLst;
   }
   /**
    *
@@ -192,8 +192,8 @@ class SpinalApplication extends globalType.Model {
    */
   getCenralNodes() {
     let res =   []
-    for (let i = 0; i < realtionsLst.length; i++) {
-      const relation = realtionsLst[i];
+    for (let i = 0; i < relationsLst.length; i++) {
+      const relation = relationsLst[i];
       let nodeList1 = relation.getNodeList1()
       for (let j = 0; j < nodeList1.length; j++) {
         const node = nodeList1[j];

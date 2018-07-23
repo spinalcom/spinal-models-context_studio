@@ -135,7 +135,7 @@
 
 ### spinalNode.addToExistingRelation(relationType, element, [isDirected], [asParent]) ⇒
 **Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
-**Returns**: the relation with the added element node in (nodeList2)  
+**Returns**: an Object of 1)relation:the relation with the added element node in (nodeList2), 2)node: the created node  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -148,7 +148,7 @@
 
 ### spinalNode.addToExistingRelationByApp(appName, relationType, element, [isDirected], [asParent]) ⇒
 **Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
-**Returns**: the relation with the added element node in (nodeList2)  
+**Returns**: an Object of 1)relation:the relation with the added element node in (nodeList2), 2)node: the created node  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
