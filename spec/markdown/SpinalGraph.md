@@ -30,7 +30,7 @@
         * [._addNotExistingNodesFromList(_list)](#SpinalGraph+_addNotExistingNodesFromList)
         * [._addNotExistingNodesFromRelation(_relation)](#SpinalGraph+_addNotExistingNodesFromRelation)
         * [.getAppsByType(appType)](#SpinalGraph+getAppsByType) ⇒
-        * [.getContext(name, relationsTypesLst, [relatedGraph], startingNode)](#SpinalGraph+getContext) ⇒
+        * [.getContext(name, relationsTypesLst, models, [Interactions], [startingNode], [relatedGraph])](#SpinalGraph+getContext) ⇒
         * [.getApp(name, relationsTypesLst, [relatedSpinalGraph])](#SpinalGraph+getApp) ⇒
         * [.getAppsNames()](#SpinalGraph+getAppsNames) ⇒
         * [.reserveUniqueRelationType(relationType, app)](#SpinalGraph+reserveUniqueRelationType) ⇒
@@ -289,7 +289,7 @@ checks if the app has the right to use a reserved relation
 
 <a name="SpinalGraph+getContext"></a>
 
-### spinalGraph.getContext(name, relationsTypesLst, [relatedGraph], startingNode) ⇒
+### spinalGraph.getContext(name, relationsTypesLst, models, [Interactions], [startingNode], [relatedGraph]) ⇒
 **Kind**: instance method of [<code>SpinalGraph</code>](#SpinalGraph)  
 **Returns**: A promise of the created Context  
 
@@ -297,8 +297,10 @@ checks if the app has the right to use a reserved relation
 | --- | --- | --- |
 | name | <code>string</code> |  | 
 | relationsTypesLst | <code>Array.&lt;string&gt;</code> |  | 
+| models | <code>Array.&lt;Object&gt;</code> |  | 
+| [Interactions] | <code>Model</code> | <code>new Model()</code> | 
+| [startingNode] | <code>SpinaNode</code> | <code>new SpinalNode(new AbstractElement(_name, &quot;root&quot;))</code> | 
 | [relatedGraph] | [<code>SpinalGraph</code>](#SpinalGraph) | <code>this</code> | 
-| startingNode | <code>Ptr</code> |  | 
 
 <a name="SpinalGraph+getApp"></a>
 

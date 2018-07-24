@@ -8,6 +8,7 @@
 * [SpinalNode](#SpinalNode) ⇐ <code>Model</code>
     * _instance_
         * [.getAppsNames()](#SpinalNode+getAppsNames) ⇒
+        * [.getElement()](#SpinalNode+getElement) ⇒
         * [.getApps()](#SpinalNode+getApps) ⇒
         * [.hasRelation()](#SpinalNode+hasRelation) ⇒
         * [.addDirectedRelationParent(relation, appName)](#SpinalNode+addDirectedRelationParent)
@@ -28,6 +29,11 @@
         * [.getRelationsByAppByType(app, relationType)](#SpinalNode+getRelationsByAppByType) ⇒
         * [.inNodeList(_nodelist)](#SpinalNode+inNodeList) ⇒
         * [.getNeighbors(relationType)](#SpinalNode+getNeighbors) ⇒
+        * [.getChildrenByRelationType(relationType)](#SpinalNode+getChildrenByRelationType) ⇒
+        * [.getChildrenByAppByRelation(appName, relationType)](#SpinalNode+getChildrenByAppByRelation) ⇒
+        * [.getChildrenElementsByAppByRelation(appName, relationType)](#SpinalNode+getChildrenElementsByAppByRelation) ⇒
+        * [.getChildrenElementsByRelationType(relationType)](#SpinalNode+getChildrenElementsByRelationType) ⇒
+        * [.getParentsByRelationType(relationType)](#SpinalNode+getParentsByRelationType) ⇒
         * [.removeRelation(_relation)](#SpinalNode+removeRelation)
         * [.removeRelations(_relations)](#SpinalNode+removeRelations)
         * [.removeRelationType(relationType)](#SpinalNode+removeRelationType)
@@ -45,6 +51,11 @@
 ### spinalNode.getAppsNames() ⇒
 **Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
 **Returns**: all applications names as string  
+<a name="SpinalNode+getElement"></a>
+
+### spinalNode.getElement() ⇒
+**Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
+**Returns**: A promise of the related Element  
 <a name="SpinalNode+getApps"></a>
 
 ### spinalNode.getApps() ⇒
@@ -103,7 +114,7 @@
 | Param | Type | Description |
 | --- | --- | --- |
 | relation | <code>SpinalRelation</code> |  |
-| name | <code>string</code> | relation Name if not organilly defined |
+| name | <code>string</code> | relation Name if not orginally defined |
 | appName | <code>string</code> |  |
 
 <a name="SpinalNode+addSimpleRelation"></a>
@@ -245,6 +256,58 @@ verify if an element is already in given nodeList
 | Param | Type | Description |
 | --- | --- | --- |
 | relationType | <code>string</code> | optional |
+
+<a name="SpinalNode+getChildrenByRelationType"></a>
+
+### spinalNode.getChildrenByRelationType(relationType) ⇒
+**Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
+**Returns**: array of spinalNode  
+
+| Param | Type |
+| --- | --- |
+| relationType | <code>string</code> | 
+
+<a name="SpinalNode+getChildrenByAppByRelation"></a>
+
+### spinalNode.getChildrenByAppByRelation(appName, relationType) ⇒
+**Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
+**Returns**: array of spinalNode  
+
+| Param | Type |
+| --- | --- |
+| appName | <code>string</code> \| <code>SpinalApplication</code> | 
+| relationType | <code>string</code> \| <code>SpinalRelation</code> | 
+
+<a name="SpinalNode+getChildrenElementsByAppByRelation"></a>
+
+### spinalNode.getChildrenElementsByAppByRelation(appName, relationType) ⇒
+**Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
+**Returns**: A promise of an array of Models  
+
+| Param | Type |
+| --- | --- |
+| appName | <code>string</code> \| <code>SpinalApplication</code> | 
+| relationType | <code>string</code> \| <code>SpinalRelation</code> | 
+
+<a name="SpinalNode+getChildrenElementsByRelationType"></a>
+
+### spinalNode.getChildrenElementsByRelationType(relationType) ⇒
+**Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
+**Returns**: A promise of an array of Models  
+
+| Param | Type |
+| --- | --- |
+| relationType | <code>string</code> | 
+
+<a name="SpinalNode+getParentsByRelationType"></a>
+
+### spinalNode.getParentsByRelationType(relationType) ⇒
+**Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
+**Returns**: array of spinalNode  
+
+| Param | Type |
+| --- | --- |
+| relationType | <code>string</code> | 
 
 <a name="SpinalNode+removeRelation"></a>
 

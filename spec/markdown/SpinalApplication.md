@@ -7,6 +7,7 @@
 * [SpinalApplication](#SpinalApplication) ⇐ <code>Model</code>
     * _instance_
         * [.reserveUniqueRelationType(relationType)](#SpinalApplication+reserveUniqueRelationType)
+        * [.setStartingNode(node)](#SpinalApplication+setStartingNode)
         * [.addRelationType(relationType)](#SpinalApplication+addRelationType)
         * [.getCharacteristicElement()](#SpinalApplication+getCharacteristicElement) ⇒
         * [.addRelation(relation)](#SpinalApplication+addRelation)
@@ -34,6 +35,15 @@
 | Param | Type |
 | --- | --- |
 | relationType | <code>string</code> | 
+
+<a name="SpinalApplication+setStartingNode"></a>
+
+### spinalApplication.setStartingNode(node)
+**Kind**: instance method of [<code>SpinalApplication</code>](#SpinalApplication)  
+
+| Param | Type |
+| --- | --- |
+| node | <code>SpinalNode</code> | 
 
 <a name="SpinalApplication+addRelationType"></a>
 
