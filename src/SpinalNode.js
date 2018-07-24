@@ -63,6 +63,15 @@ class SpinalNode extends globalType.Model {
   /**
    *
    *
+   * @returns A promise of the related Element 
+   * @memberof SpinalNode
+   */
+  async getElement() {
+    return await Utilities.promiseLoad(this.element)
+  }
+  /**
+   *
+   *
    * @returns all applications
    * @memberof SpinalNode
    */
@@ -176,7 +185,7 @@ class SpinalNode extends globalType.Model {
    *
    *
    * @param {SpinalRelation} relation
-   * @param {string} name -relation Name if not organilly defined
+   * @param {string} name -relation Name if not orginally defined
    * @param {string} appName
    * @memberof SpinalNode
    */
@@ -199,12 +208,12 @@ class SpinalNode extends globalType.Model {
         }
         if (typeof this.apps[appName] !== "undefined")
           this.apps[appName].add_attr({
-            [relation.type.get()]: relation
+            [nameTmp]: relation
           });
         else {
           let list = new Model();
           list.add_attr({
-            [relation.type.get()]: relation
+            [nameTmp]: relation
           });
           this.apps.add_attr({
             [appName]: list
@@ -623,6 +632,163 @@ class SpinalNode extends globalType.Model {
       }
     }
     return neighbors;
+  }
+
+  /**
+   *
+   *
+   * @param {string} relationType
+   * @returns array of spinalNode
+   * @memberof SpinalNode
+   */
+  getChildrenByRelationType(relationType) {
+    let res = []
+    if (this.relations[relationType + ">"])
+      for (let index = 0; index < this.relations[relationType + ">"].length; index++) {
+        const relation = this.relations[relationType + ">"][index];
+        let nodeList2 = relation.getNodeList2();
+        res = res.concat(nodeList2)
+      }
+    return res
+  }
+
+  //TODO
+  // /**
+  //  *
+  //  *
+  //  * @param {string|SpinalRelation} relation
+  //  * @returns boolean
+  //  * @memberof SpinalNode
+  //  */
+  // isParent(relation) {
+  //   if (typeof relation === "string") {
+  //     if (typeof this.relations[relation + ">"] != "undefined") {
+  //       let relations = this.relations[relation + ">"]
+  //       for (let index = 0; index < relations.length; index++) {
+  //         const relation = relations[index];
+  //         let nodeList1 = relation.getNodeList1()
+  //         return Utilities.containsLstById(nodeList1, this)
+  //       }
+  //     }
+  //   } else {
+  //     let nodeList1 = relation.getNodeList1()
+  //     return Utilities.containsLstById(nodeList1, this)
+  //   }
+  //   return false;
+  // }
+
+  //TODO
+  // /**
+  //  *
+  //  *
+  //  * @param {SpinalRelation} relation
+  //  * @returns boolean
+  //  * @memberof SpinalNode
+  //  */
+  // isChild(relation) {
+  //   let nodeList2 = relation.getNodeList2()
+  //   return Utilities.containsLstById(nodeList2, this)
+  // }
+
+  //TODO Optimize
+  /**
+   *
+   *
+   * @param {string | SpinalApplication} appName
+   * @param {string | SpinalRelation} relationType
+   * @returns array of spinalNode
+   * @memberof SpinalNode
+   */
+  getChildrenByAppByRelation(app, relation) {
+    let appName = ""
+    let relationType = ""
+    let res = []
+    if (typeof app != "string")
+      appName = app.name.get()
+    else
+      appName = app
+    if (typeof app != "string")
+      relationType = relation.name.get()
+    else
+      relationType = relation
+    if (typeof this.apps[appName] != "undefined" && typeof this.apps[
+        appName][relationType + ">"] != "undefined") {
+      let relationTmp = this.apps[appName][relationType + ">"]
+      let nodeList2 = relationTmp.getNodeList2()
+      res = res.concat(nodeList2)
+    }
+    return res
+  }
+
+  /**
+   *
+   *
+   * @param {string | SpinalApplication} appName
+   * @param {string | SpinalRelation} relationType
+   * @returns  A promise of an array of Models
+   * @memberof SpinalNode
+   */
+  async getChildrenElementsByAppByRelation(app, relation) {
+    let appName = ""
+    let relationType = ""
+    let res = []
+    if (typeof app != "string")
+      appName = app.name.get()
+    else
+      appName = app
+    if (typeof app != "string")
+      relationType = relation.name.get()
+    else
+      relationType = relation
+    if (typeof this.apps[appName] != "undefined" && typeof this.apps[
+        appName][relationType + ">"] != "undefined") {
+      let relationTmp = this.apps[appName][relationType + ">"]
+      let nodeList2 = relationTmp.getNodeList2()
+      for (let index = 0; index < nodeList2.length; index++) {
+        const node = nodeList2[index];
+        res.push(await node.getElement())
+      }
+    }
+    return res
+  }
+
+  /**
+   *
+   *
+   * @param {string} relationType
+   * @returns A promise of an array of Models
+   * @memberof SpinalNode
+   */
+  async getChildrenElementsByRelationType(relationType) {
+    let res = []
+    if (this.relations[relationType + ">"])
+      for (let index = 0; index < this.relations[relationType + ">"].length; index++) {
+        const relation = this.relations[relationType + ">"][index];
+        let nodeList2 = relation.getNodeList2();
+        for (let index = 0; index < nodeList2.length; index++) {
+          const node = nodeList2[index];
+          res.push(await Utilities.promiseLoad(node.element))
+        }
+      }
+    return res
+  }
+
+  /**
+   *
+   *
+   * @param {string} relationType
+   * @returns array of spinalNode
+   * @memberof SpinalNode
+   */
+  getParentsByRelationType(relationType) {
+    let res = []
+    if (this.relations[relationType + "<"])
+      for (let index = 0; index < this.relations[relationType + "<"].length; index++) {
+        const relation = this.relations[relationType + "<"][index];
+        let nodeList1 = relation.getNodeList1();
+        res = res.concat(nodeList1)
+      }
+    return res
   }
   /**
    *

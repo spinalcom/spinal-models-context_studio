@@ -46,6 +46,15 @@ class SpinalApplication extends globalType.Model {
     this.relatedGraph.reserveUniqueRelationType(relationType, this)
   }
 
+  setStartingNode(node) {
+    if (typeof this.startingNode != "undefined")
+      this.add_attr({
+        startingNode: node
+      })
+    else
+      this.startingNode = node
+  }
+
 
   /**
    *

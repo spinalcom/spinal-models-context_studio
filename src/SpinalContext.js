@@ -25,7 +25,7 @@ class SpinalContext extends SpinalApplication {
    * @param {string[]} relationsTypesLst
    * @param {Object[]} models
    * @param {Model} [Interactions= new Model()]
-   * @param {SpinaNode} [startingNode = new SpinalNode("root",new AbstractElement(_name, "root"))]
+   * @param {SpinaNode} [startingNode = new AbstractElement(name, "root")]
    * @param {SpinalGraph} relatedGraph
    * @param {string} [name="SpinalContext"]
    * @memberof SpinalContext
@@ -35,15 +35,17 @@ class SpinalContext extends SpinalApplication {
     relationsTypesLst,
     models,
     Interactions = new globalType.Model(),
-    startingNode = new SpinalNode("root", new AbstractElement(_name, "root")),
+    startingNode = new AbstractElement(_name, "root"),
     relatedGraph,
     name = "SpinalContext"
   ) {
     super(_name, relationsTypesLst, relatedGraph);
     if (FileSystem._sig_server) {
+      let rootNode = relatedGraph.addNode(startingNode);
+
       this.add_attr({
         models: models,
-        startingNode: startingNode,
+        startingNode: rootNode,
         Interactions: Interactions,
         contextImage: new Lst()
       });
