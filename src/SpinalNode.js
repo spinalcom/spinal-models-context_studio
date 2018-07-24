@@ -647,7 +647,7 @@ class SpinalNode extends globalType.Model {
       for (let index = 0; index < this.relations[relationType + ">"].length; index++) {
         const relation = this.relations[relationType + ">"][index];
         let nodeList2 = relation.getNodeList2();
-        res = res.concat(nodeList2)
+        res = Utilities.concat(res, nodeList2)
       }
     return res
   }
@@ -715,7 +715,7 @@ class SpinalNode extends globalType.Model {
         appName][relationType + ">"] != "undefined") {
       let relationTmp = this.apps[appName][relationType + ">"]
       let nodeList2 = relationTmp.getNodeList2()
-      res = res.concat(nodeList2)
+      res = Utilities.concat(res, nodeList2)
     }
     return res
   }
@@ -786,7 +786,7 @@ class SpinalNode extends globalType.Model {
       for (let index = 0; index < this.relations[relationType + "<"].length; index++) {
         const relation = this.relations[relationType + "<"][index];
         let nodeList1 = relation.getNodeList1();
-        res = res.concat(nodeList1)
+        res = Utilities.concat(res, nodeList1)
       }
     return res
   }
