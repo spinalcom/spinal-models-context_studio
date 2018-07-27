@@ -366,7 +366,7 @@ class SpinalNode extends globalType.Model {
    *
    * @param {string} appName
    * @param {string} relationType
-   * @param {Model} element - any subclass of Model
+   * @param {Model| SpinalNode} element - Model:any subclass of Model
    * @param {boolean} [isDirected=false]
    * @param {boolean} [asParent=false]
    * @returns an Object of 1)relation:the relation with the added element node in (nodeList2), 2)node: the created node
@@ -393,7 +393,8 @@ class SpinalNode extends globalType.Model {
               isDirected === relation.isDirected.get()
             ) {
               if (isDirected && this.isParent(relation)) {
-                node2 = this.relatedGraph.addNode(element);
+                if (element.constructor.name != "SpinalNode")
+                  node2 = this.relatedGraph.addNode(element);
                 res.node = node2;
                 if (asParent) {
                   relation.addNodetoNodeList1(node2);
@@ -604,6 +605,13 @@ class SpinalNode extends globalType.Model {
         const appRelation = this.apps[appName][this.apps[appName]._attribute_names[
           index]];
         if (appRelation.type.get() === relationType) res.push(appRelation);
+        else if (!appRelation.isDirected.get() && appRelation.type.get() +
+          "-" === relationType) res.push(appRelation);
+        else if (appRelation.type.get() + ">" === relationType) res.push(
+          appRelation);
+        else if (appRelation.type.get() + "<" === relationType) res.push(
+          appRelation);
+
       }
     }
     return res;
@@ -903,6 +911,18 @@ class SpinalNode extends globalType.Model {
   hasRelationByAppByTypeDefined(appName, relationType) {
     if (this.hasAppDefined(appName) && typeof this.apps[appName][
         relationType
+      ] !==
+      "undefined" || this.hasAppDefined(appName) && typeof this.apps[
+        appName][
+        relationType + "-"
+      ] !==
+      "undefined" || this.hasAppDefined(appName) && typeof this.apps[
+        appName][
+        relationType + ">"
+      ] !==
+      "undefined" || this.hasAppDefined(appName) && typeof this.apps[
+        appName][
+        relationType + "<"
       ] !==
       "undefined")
       return true
