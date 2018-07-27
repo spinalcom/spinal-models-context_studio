@@ -222,17 +222,26 @@ class SpinalNode extends globalType.Model {
             [nameTmp]: list
           });
         }
-        if (typeof this.apps[appName] !== "undefined")
+        if (typeof this.apps[appName] !== "undefined" && typeof this.apps[
+            appName][nameTmp] !== "undefined")
+          this.apps[appName][nameTmp].push(relation)
+        else if (typeof this.apps[appName] !== "undefined" && typeof this
+          .apps[
+            appName][nameTmp] === "undefined") {
+          let relationList = new Lst()
+          relationList.push(relation)
           this.apps[appName].add_attr({
-            [nameTmp]: relation
+            [nameTmp]: relationList
           });
-        else {
-          let list = new Model();
-          list.add_attr({
-            [nameTmp]: relation
+        } else {
+          let app = new Model();
+          let relationList = new Lst()
+          relationList.push(relation)
+          app.add_attr({
+            [nameTmp]: relationList
           });
           this.apps.add_attr({
-            [appName]: list
+            [appName]: app
           });
         }
       } else {
@@ -278,16 +287,21 @@ class SpinalNode extends globalType.Model {
    *
    * @param {string} appName
    * @param {string} relationType
-   * @param {Model} element
+   * @param {Model |SpinalNode} element
    * @param {boolean} [isDirected=false]
+   * @param {boolean} [asNode=false] - to put a SpinalNode inside a SpinalNode
    * @returns the created relation
+   * 
    * @memberof SpinalNode
    */
-  addSimpleRelationByApp(appName, relationType, element, isDirected = false) {
+  addSimpleRelationByApp(appName, relationType, element, isDirected = false,
+    asNode = false) {
     if (this.relatedGraph.hasReservationCredentials(relationType, appName)) {
       if (this.relatedGraph.containsApp(appName)) {
         let res = {}
-        let node2 = this.relatedGraph.addNode(element);
+        let node2 = element
+        if (asNode || element.constructor.name != "SpinalNode")
+          node2 = this.relatedGraph.addNode(element);
         res.node = node2
         let rel = new SpinalRelation(relationType, [this], [node2],
           isDirected);
@@ -369,6 +383,7 @@ class SpinalNode extends globalType.Model {
    * @param {Model| SpinalNode} element - Model:any subclass of Model
    * @param {boolean} [isDirected=false]
    * @param {boolean} [asParent=false]
+   * @param {boolean} [asNode=false] - to put a SpinalNode inside a SpinalNode
    * @returns an Object of 1)relation:the relation with the added element node in (nodeList2), 2)node: the created node
    * @memberof SpinalNode
    */
@@ -377,10 +392,11 @@ class SpinalNode extends globalType.Model {
     relationType,
     element,
     isDirected = false,
-    asParent = false
+    asParent = false,
+    asNode = false
   ) {
     let res = {}
-    let node2 = null
+    let node2 = element; //initialize
     if (this.relatedGraph.hasReservationCredentials(relationType, appName)) {
       if (this.relatedGraph.containsApp(appName)) {
         if (typeof this.apps[appName] !== "undefined") {
@@ -393,7 +409,7 @@ class SpinalNode extends globalType.Model {
               isDirected === relation.isDirected.get()
             ) {
               if (isDirected && this.isParent(relation)) {
-                if (element.constructor.name != "SpinalNode")
+                if (asNode || element.constructor.name != "SpinalNode")
                   node2 = this.relatedGraph.addNode(element);
                 res.node = node2;
                 if (asParent) {
@@ -406,7 +422,8 @@ class SpinalNode extends globalType.Model {
                   return res;
                 }
               } else if (!isDirected) {
-                node2 = this.relatedGraph.addNode(element);
+                if (asNode || element.constructor.name != "SpinalNode")
+                  node2 = this.relatedGraph.addNode(element);
                 res.node = node2;
                 relation.addNodetoNodeList2(node2);
                 node2.addNonDirectedRelation(relation, appName);
@@ -559,9 +576,12 @@ class SpinalNode extends globalType.Model {
     let res = [];
     if (this.hasAppDefined(appName)) {
       for (let index = 0; index < this.apps[appName]._attribute_names.length; index++) {
-        const appRelation = this.apps[appName][this.apps[appName]._attribute_names[
+        const appRelationList = this.apps[appName][this.apps[appName]._attribute_names[
           index]];
-        res.push(appRelation);
+        for (let index = 0; index < appRelationList.length; index++) {
+          const relation = appRelationList[index];
+          res.push(relation);
+        }
       }
     }
     return res;
@@ -602,16 +622,18 @@ class SpinalNode extends globalType.Model {
     let res = [];
     if (this.hasRelationByAppByTypeDefined(appName, relationType)) {
       for (let index = 0; index < this.apps[appName]._attribute_names.length; index++) {
-        const appRelation = this.apps[appName][this.apps[appName]._attribute_names[
+        const appRelationList = this.apps[appName][this.apps[appName]._attribute_names[
           index]];
-        if (appRelation.type.get() === relationType) res.push(appRelation);
-        else if (!appRelation.isDirected.get() && appRelation.type.get() +
-          "-" === relationType) res.push(appRelation);
-        else if (appRelation.type.get() + ">" === relationType) res.push(
-          appRelation);
-        else if (appRelation.type.get() + "<" === relationType) res.push(
-          appRelation);
-
+        for (let index = 0; index < appRelationList.length; index++) {
+          const relation = appRelationList[index];
+          if (relation.type.get() === relationType) res.push(relation);
+          else if (!relation.isDirected.get() && relation.type.get() +
+            "-" === relationType) res.push(relation);
+          else if (relation.type.get() + ">" === relationType) res.push(
+            relation);
+          else if (relation.type.get() + "<" === relationType) res.push(
+            relation);
+        }
       }
     }
     return res;
@@ -766,9 +788,11 @@ class SpinalNode extends globalType.Model {
       relationType = relation
     if (typeof this.apps[appName] != "undefined" && typeof this.apps[
         appName][relationType + ">"] != "undefined") {
-      let relationTmp = this.apps[appName][relationType + ">"]
-      let nodeList2 = relationTmp.getNodeList2()
-      res = Utilities.concat(res, nodeList2)
+      for (let index = 0; index < this.apps[appName][relationType + ">"].length; index++) {
+        const relation = this.apps[appName][relationType + ">"][index];
+        let nodeList2 = relation.getNodeList2()
+        res = Utilities.concat(res, nodeList2)
+      }
     }
     return res
   }
