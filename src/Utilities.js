@@ -65,14 +65,14 @@ Utilities.arraysEqual = function(arrayA, arrayB) {
   return true;
 }
 
-// Utilities.containsLstById = function(_list, _node) {
-//   for (let index = 0; index < _list.length; index++) {
-//     const element = _list[index];
-//     if (element.id.get() == _node.id.get())
-//       return true
-//   }
-//   return false
-// }
+Utilities.containsLstById = function(_list, _node) {
+  for (let index = 0; index < _list.length; index++) {
+    const element = _list[index];
+    if (element.id.get() == _node.id.get())
+      return true
+  }
+  return false
+}
 
 Utilities.containsLstModel = function(_list, _model) {
   for (let index = 0; index < _list.length; index++) {

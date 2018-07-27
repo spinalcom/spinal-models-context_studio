@@ -29,6 +29,7 @@ class SpinalNode extends globalType.Model {
     super();
     if (FileSystem._sig_server) {
       this.add_attr({
+        id: Utilities.guid(this.constructor.name),
         name: _name,
         element: new Ptr(element),
         relations: new Model(),
@@ -38,12 +39,26 @@ class SpinalNode extends globalType.Model {
       if (typeof this.relatedGraph !== "undefined") {
         this.relatedGraph.classifyNode(this);
       }
-      if (typeof _relations !== "undefined") {
-        if (Array.isArray(_relations) || _relations instanceof Lst)
-          this.addRelations(_relations);
-        else this.addRelation(_relations);
+      if (typeof relations !== "undefined") {
+        if (Array.isArray(relations) || relations instanceof Lst)
+          this.addRelations(relations);
+        else this.addRelation(relations);
       }
     }
+  }
+  /**
+   *
+   *
+   * @param {string} type
+   * @memberof SpinalNode
+   */
+  setType(type) {
+    if (typeof this.type === "undefined")
+      this.add_attr({
+        type: type
+      })
+    else
+      this.type = type
   }
 
   // registerApp(app) {
@@ -196,6 +211,7 @@ class SpinalNode extends globalType.Model {
         let nameTmp = relation.type.get();
         if (typeof name !== "undefined") {
           nameTmp = name;
+          // relation.name.set(nameTmp)
         }
         if (typeof this.relations[nameTmp] !== "undefined")
           this.relations[nameTmp].push(relation);
@@ -315,9 +331,9 @@ class SpinalNode extends globalType.Model {
           relationType === relationType &&
           isDirected === relation.isDirected.get()
         ) {
-          node2 = this.relatedGraph.addNode(element);
-          res.node = node2;
-          if (isDirected) {
+          if (isDirected && this.isParent(relation)) {
+            node2 = this.relatedGraph.addNode(element);
+            res.node = node2;
             if (asParent) {
               relation.addNodetoNodeList1(node2);
               node2.addDirectedRelationParent(relation);
@@ -327,7 +343,9 @@ class SpinalNode extends globalType.Model {
               node2.addDirectedRelationChild(relation);
               return res;
             }
-          } else {
+          } else if (!isDirected) {
+            node2 = this.relatedGraph.addNode(element);
+            res.node = node2;
             relation.addNodetoNodeList2(node2);
             node2.addNonDirectedRelation(relation);
             return res;
@@ -374,9 +392,9 @@ class SpinalNode extends globalType.Model {
               relation.type.get() === relationType &&
               isDirected === relation.isDirected.get()
             ) {
-              node2 = this.relatedGraph.addNode(element);
-              res.node = node2;
-              if (isDirected) {
+              if (isDirected && this.isParent(relation)) {
+                node2 = this.relatedGraph.addNode(element);
+                res.node = node2;
                 if (asParent) {
                   relation.addNodetoNodeList1(node2);
                   node2.addDirectedRelationParent(relation, appName);
@@ -386,7 +404,9 @@ class SpinalNode extends globalType.Model {
                   node2.addDirectedRelationChild(relation, appName);
                   return res;
                 }
-              } else {
+              } else if (!isDirected) {
+                node2 = this.relatedGraph.addNode(element);
+                res.node = node2;
                 relation.addNodetoNodeList2(node2);
                 node2.addNonDirectedRelation(relation, appName);
                 return res;
@@ -531,7 +551,7 @@ class SpinalNode extends globalType.Model {
    *
    *
    * @param {string} appName
-   * @returns all relations of a specific app
+   * @returns an array of all relations of a specific app for this node
    * @memberof SpinalNode
    */
   getRelationsByAppName(appName) {
@@ -545,6 +565,19 @@ class SpinalNode extends globalType.Model {
     }
     return res;
   }
+
+  // /**
+  //  *
+  //  *
+  //  * @param {string} appName
+  //  * @returns an object of all relations of a specific app for this node
+  //  * @memberof SpinalNode
+  //  */
+  // getRelationsWithKeysByAppName(appName) {
+  //   if (this.hasAppDefined(appName)) {
+  //     return this.apps[appName];
+  //   }
+  // }
   /**
    *
    *
@@ -676,6 +709,18 @@ class SpinalNode extends globalType.Model {
   //   }
   //   return false;
   // }
+
+  /**
+   *
+   *
+   * @param {SpinalRelation} relation
+   * @returns boolean
+   * @memberof SpinalNode
+   */
+  isParent(relation) {
+    let nodeList1 = relation.getNodeList1()
+    return Utilities.containsLstById(nodeList1, this)
+  }
 
   //TODO
   // /**

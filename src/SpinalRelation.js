@@ -8,20 +8,22 @@ import { Utilities } from "./Utilities";
 
 export default class SpinalRelation extends globalType.Model {
   constructor(
-    _type,
-    _nodeList1,
-    _nodeList2,
-    _isDirected,
+    type,
+    nodeList1,
+    nodeList2,
+    isDirected,
+    // _name = "",
     name = "SpinalRelation"
   ) {
     super();
     if (FileSystem._sig_server) {
       this.add_attr({
         id: Utilities.guid(this.constructor.name),
-        type: _type,
-        nodeList1: _nodeList1,
-        nodeList2: _nodeList2,
-        isDirected: _isDirected || false
+        type: type,
+        nodeList1: nodeList1,
+        nodeList2: nodeList2,
+        isDirected: isDirected || false
+        // name: _name
       });
     }
   }
