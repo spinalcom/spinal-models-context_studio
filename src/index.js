@@ -18,27 +18,18 @@ const spinalCore = require("spinal-core-connectorjs");
 const globalType = typeof window === "undefined" ? global : window;
 let getViewer = function() {
   return globalType.v;
-}
+};
 
-
-
-
-import SpinalGraph from "./SpinalGraph"
-import SpinalNode from "./SpinalNode"
-import SpinalRelation from "./SpinalRelation"
-import AbstractElement from "./AbstractElement"
-import BIMElement from "./BIMElement"
-import SpinalApplication from "./SpinalApplication"
-import SpinalContext from "./SpinalContext"
-import SpinalNetwork from "./SpinalNetwork"
-import SpinalDevice from "./SpinalDevice"
-import SpinalEndpoint from "./SpinalEndpoint"
-
-
-
-
-
-
+import SpinalGraph from "./SpinalGraph";
+import SpinalNode from "./SpinalNode";
+import SpinalRelation from "./SpinalRelation";
+import AbstractElement from "./AbstractElement";
+import BIMElement from "./BIMElement";
+import SpinalApplication from "./SpinalApplication";
+import SpinalContext from "./SpinalContext";
+import SpinalNetwork from "./SpinalNetwork";
+import SpinalDevice from "./SpinalDevice";
+import SpinalEndpoint from "./SpinalEndpoint";
 
 export {
   SpinalGraph,
@@ -51,4 +42,4 @@ export {
   SpinalNetwork,
   SpinalDevice,
   SpinalEndpoint
-}
+};

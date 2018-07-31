@@ -58,6 +58,10 @@ class SpinalApplication extends globalType.Model {
       })
     else
       this.startingNode = node
+
+    node.apps.add_attr({
+      [this.name.get()]: new Model()
+    })
   }
 
 

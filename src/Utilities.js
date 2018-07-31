@@ -122,11 +122,11 @@ Utilities.concat = function(listA, listB) {
   return res;
 }
 
-Utilities.allButMeById = function(_list) {
+Utilities.allButMeById = function(_list, _node) {
   let res = [];
   for (let index = 0; index < _list.length; index++) {
     const node = _list[index];
-    if (node.id.get() != this.id.get()) {
+    if (node.id.get() != _node.id.get()) {
       res.push(node);
     }
     return res;

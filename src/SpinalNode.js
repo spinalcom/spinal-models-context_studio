@@ -739,11 +739,11 @@ class SpinalNode extends globalType.Model {
       } else {
         neighbors = Utilities.concat(
           neighbors,
-          Utilities.allButMeById(relation.nodeList1)
+          Utilities.allButMeById(relation.nodeList1, this)
         );
         neighbors = Utilities.concat(
           neighbors,
-          Utilities.allButMeById(relation.nodeList2)
+          Utilities.allButMeById(relation.nodeList2, this)
         );
       }
     }
