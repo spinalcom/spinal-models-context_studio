@@ -48,17 +48,18 @@ class SpinalNode extends globalType.Model {
   }
   /**
    *
-   *
+   * @param {string} appName
    * @param {string} type
    * @memberof SpinalNode
    */
-  setType(type) {
+  addType(appName, type) {
     if (typeof this.type === "undefined")
       this.add_attr({
-        type: type
+        type: new Model()
       })
-    else
-      this.type = type
+    this.type.add_attr({
+      [appName]: type
+    })
   }
 
   // registerApp(app) {
@@ -449,6 +450,39 @@ class SpinalNode extends globalType.Model {
     }
   }
 
+  /**
+   *
+   *
+   * @param {string | SpinalApplication} app
+   * @param {string | SpinalRelation} relation
+   * @param {SpinalNode} node
+   * @param {boolean} [isDirected=false]
+   * @memberof SpinalNode
+   */
+  removeFromExistingRelationByApp(
+    app,
+    relation,
+    node,
+    isDirected = false) {
+    let appName = ""
+    if (typeof app != "string")
+      appName = app.name.get()
+    else
+      appName = app
+    let relationType = ""
+    if (typeof relation != "string")
+      relationType = relation.type.get()
+    else
+      relationType = relation
+    let relations = this.getRelationsByAppNameByType(appName, relationType)
+    for (let index = 0; index < relations.length; index++) {
+      const relation = relations[index];
+      if (relation.isDirected.get() === isDirected)
+        relation.removeFromNodeList2(node)
+    }
+
+  }
+
 
 
 
@@ -569,18 +603,31 @@ class SpinalNode extends globalType.Model {
    *
    *
    * @param {string} appName
+   * @param {string} asParent
    * @returns an array of all relations of a specific app for this node
    * @memberof SpinalNode
    */
-  getRelationsByAppName(appName) {
+  getRelationsByAppName(appName, asParent) {
     let res = [];
     if (this.hasAppDefined(appName)) {
       for (let index = 0; index < this.apps[appName]._attribute_names.length; index++) {
-        const appRelationList = this.apps[appName][this.apps[appName]._attribute_names[
-          index]];
-        for (let index = 0; index < appRelationList.length; index++) {
-          const relation = appRelationList[index];
-          res.push(relation);
+        if (typeof asParent != "undefined") {
+          if (this.apps[appName]._attribute_names[index].includes(">", this
+              .apps[appName]._attribute_names[index].length - 2)) {
+            const appRelationList = this.apps[appName][this.apps[appName]._attribute_names[
+              index]];
+            for (let index = 0; index < appRelationList.length; index++) {
+              const relation = appRelationList[index];
+              res.push(relation);
+            }
+          }
+        } else {
+          const appRelationList = this.apps[appName][this.apps[appName]._attribute_names[
+            index]];
+          for (let index = 0; index < appRelationList.length; index++) {
+            const relation = appRelationList[index];
+            res.push(relation);
+          }
         }
       }
     }
@@ -602,13 +649,18 @@ class SpinalNode extends globalType.Model {
   /**
    *
    *
-   * @param {SpinalApplication} app
+   * @param {SpinalApplication | string} app
+   * @param {string} asParent
    * @returns all relations of a specific app
    * @memberof SpinalNode
    */
-  getRelationsByApp(app) {
-    let appName = app.name.get()
-    return this.getRelationsByAppName(appName)
+  getRelationsByApp(app, asParent) {
+    let appName = ""
+    if (typeof app != "string")
+      appName = app.name.get()
+    else
+      appName = app
+    return this.getRelationsByAppName(appName, asParent)
   }
   /**
    *
@@ -647,6 +699,7 @@ class SpinalNode extends globalType.Model {
    * @memberof SpinalNode
    */
   getRelationsByAppByType(app, relationType) {
+
     let appName = app.name.get()
     return this.getRelationsByAppNameByType(appName, relationType)
 
@@ -695,6 +748,32 @@ class SpinalNode extends globalType.Model {
       }
     }
     return neighbors;
+  }
+
+  getChildrenByApp(app) {
+    let res = []
+    if (this.hasChildren()) {
+      let relations = this.getRelationsByApp(app, true);
+      for (let index = 0; index < relations.length; index++) {
+        const relation = relations[index];
+        res = res.concat(this.getChildrenByAppByRelation(app, relation))
+      }
+    }
+    return res
+  }
+  /**
+   *
+   *
+   * @returns boolean
+   * @memberof SpinalNode
+   */
+  hasChildren() {
+    for (let index = 0; index < this.relations._attribute_names.length; index++) {
+      const relationsName = this.relations._attribute_names[index];
+      if (relationsName.includes(">", relationsName.length - 2))
+        return true
+    }
+    return false
   }
 
   /**
@@ -769,7 +848,7 @@ class SpinalNode extends globalType.Model {
   /**
    *
    *
-   * @param {string | SpinalApplication} appName
+   * @param {string | SpinalApplication} app
    * @param {string | SpinalRelation} relationType
    * @returns array of spinalNode
    * @memberof SpinalNode
@@ -782,8 +861,8 @@ class SpinalNode extends globalType.Model {
       appName = app.name.get()
     else
       appName = app
-    if (typeof app != "string")
-      relationType = relation.name.get()
+    if (typeof relation != "string")
+      relationType = relation.type.get()
     else
       relationType = relation
     if (typeof this.apps[appName] != "undefined" && typeof this.apps[
@@ -813,8 +892,8 @@ class SpinalNode extends globalType.Model {
       appName = app.name.get()
     else
       appName = app
-    if (typeof app != "string")
-      relationType = relation.name.get()
+    if (typeof relation != "string")
+      relationType = relation.type.get()
     else
       relationType = relation
     if (typeof this.apps[appName] != "undefined" && typeof this.apps[

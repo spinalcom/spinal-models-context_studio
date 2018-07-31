@@ -126,6 +126,16 @@ export default class SpinalRelation extends globalType.Model {
     }
   }
 
+  removeFromNodeList2(node) {
+    for (let index = 0; index < this.nodeList2.length; index++) {
+      const candidateNode = this.nodeList2[index];
+      if (node.id.get() === candidateNode.id.get()) {
+        this.nodeList2.splice(index, 1);
+        return;
+      }
+    }
+  }
+
   toJson() {
     return {
       id: this.id.get(),

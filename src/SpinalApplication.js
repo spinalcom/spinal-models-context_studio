@@ -206,8 +206,8 @@ class SpinalApplication extends globalType.Model {
    */
   getCenralNodes() {
     let res =   []
-    for (let i = 0; i < relationsLst.length; i++) {
-      const relation = relationsLst[i];
+    for (let i = 0; i < this.relationsLst.length; i++) {
+      const relation = this.relationsLst[i];
       let nodeList1 = relation.getNodeList1()
       for (let j = 0; j < nodeList1.length; j++) {
         const node = nodeList1[j];
@@ -225,8 +225,8 @@ class SpinalApplication extends globalType.Model {
    */
   getCenralNodesByRelationType(relationType) {
     let res =   []
-    for (let i = 0; i < relationsByType[relationType].length; i++) {
-      const relation = relationsByType[relationType][i];
+    for (let i = 0; i < this.relationsByType[relationType].length; i++) {
+      const relation = this.relationsByType[relationType][i];
       let nodeList1 = relation.getNodeList1()
       for (let j = 0; j < nodeList1.length; j++) {
         const node = nodeList1[j];

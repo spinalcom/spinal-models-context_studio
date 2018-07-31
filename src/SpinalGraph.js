@@ -574,6 +574,8 @@ class SpinalGraph extends globalType.Model {
         [name]: new Ptr(context)
       });
 
+      context.type.set("context")
+
       if (typeof this.appsListByType.context === "undefined") {
         this.appsListByType.add_attr({
           context: new Model()
@@ -617,6 +619,7 @@ class SpinalGraph extends globalType.Model {
       // );
     }
   }
+
 
   /**
    *
