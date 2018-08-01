@@ -1,11 +1,7 @@
 const spinalCore = require("spinal-core-connectorjs");
 const globalType = typeof window === "undefined" ? global : window;
 
-import {
-  Utilities
-} from "./Utilities";
-
-
+import { Utilities } from "./Utilities";
 
 /**
  *
@@ -22,8 +18,12 @@ class SpinalApplication extends globalType.Model {
    * @param {string} [name="SpinalApplication"]
    * @memberof SpinalApplication
    */
-  constructor(_name, relationsTypesLst, relatedGraph, name =
-    "SpinalApplication") {
+  constructor(
+    _name,
+    relationsTypesLst,
+    relatedGraph,
+    name = "SpinalApplication"
+  ) {
     super();
     if (FileSystem._sig_server) {
       this.add_attr({
@@ -43,7 +43,7 @@ class SpinalApplication extends globalType.Model {
    * @memberof SpinalApplication
    */
   reserveUniqueRelationType(relationType) {
-    this.relatedGraph.reserveUniqueRelationType(relationType, this)
+    this.relatedGraph.reserveUniqueRelationType(relationType, this);
   }
   /**
    *
@@ -55,15 +55,13 @@ class SpinalApplication extends globalType.Model {
     if (typeof this.startingNode === "undefined")
       this.add_attr({
         startingNode: node
-      })
-    else
-      this.startingNode = node
+      });
+    else this.startingNode = node;
 
     node.apps.add_attr({
       [this.name.get()]: new Model()
-    })
+    });
   }
-
 
   /**
    *
@@ -73,15 +71,14 @@ class SpinalApplication extends globalType.Model {
    */
   addRelationType(relationType) {
     if (!this.relatedGraph.isReserved(relationType)) {
-      if (!Utilities.containsLst(this.relationsTypesLst,
-          relationType)) {
+      if (!Utilities.containsLst(this.relationsTypesLst, relationType)) {
         this.relationsTypesLst.push(relationType);
       }
     } else {
       console.log(
         relationType +
-        " is reserved by " +
-        this.reservedRelationsNames[relationType]
+          " is reserved by " +
+          this.reservedRelationsNames[relationType]
       );
     }
   }
@@ -103,39 +100,42 @@ class SpinalApplication extends globalType.Model {
   addRelation(relation) {
     if (!this.relatedGraph.isReserved(relation.type.get())) {
       this.addRelationType(relation.type.get());
-      if (typeof this.relationsByType[relation.type.get()] ===
-        "undefined") {
-        let list = new Lst()
-        list.push(relation)
+      if (typeof this.relationsByType[relation.type.get()] === "undefined") {
+        let list = new Lst();
+        list.push(relation);
         this.relationsByType.add_attr({
           [relation.type.get()]: list
         });
       } else {
-        this.relationsByType[relation.type.get()].push(relation)
+        this.relationsByType[relation.type.get()].push(relation);
       }
-      this.relationsLst.push(relation)
+      this.relationsLst.push(relation);
     } else {
       console.log(
         relation.type.get() +
-        " is reserved by " +
-        this.reservedRelationsNames[relation.type.get()]
+          " is reserved by " +
+          this.reservedRelationsNames[relation.type.get()]
       );
     }
   }
   /**
-   * 
-   * check if the application declared a relation type 
+   *
+   * check if the application declared a relation type
    * @param {string} relationType
    * @returns boolean
    * @memberof SpinalApplication
    */
   hasRelationType(relationType) {
     if (Utilities.containsLst(this.relationsTypesLst, relationType))
-      return true
+      return true;
     else {
-      console.warn(this.name.get() + " has not declared " + relationType +
-        " as one of its relation Types.");
-      return false
+      console.warn(
+        this.name.get() +
+          " has not declared " +
+          relationType +
+          " as one of its relation Types."
+      );
+      return false;
     }
   }
   /**
@@ -146,15 +146,17 @@ class SpinalApplication extends globalType.Model {
    * @memberof SpinalApplication
    */
   hasRelationTypeDefined(relationType) {
-    if (typeof this.relationsByType[relationType] !== "undefined")
-      return true
+    if (typeof this.relationsByType[relationType] !== "undefined") return true;
     else {
-      console.warn("relation " + relationType +
-        " is not defined for app " + this.name.get());
-      return false
+      console.warn(
+        "relation " +
+          relationType +
+          " is not defined for app " +
+          this.name.get()
+      );
+      return false;
     }
   }
-
 
   /**
    *
@@ -164,11 +166,12 @@ class SpinalApplication extends globalType.Model {
    * @memberof SpinalApplication
    */
   getRelationsByType(relationType) {
-    if (this.hasRelationType(relationType) && this.hasRelationTypeDefined(
-        relationType))
-      return this.relationsByType[relationType]
-    else
-      return []
+    if (
+      this.hasRelationType(relationType) &&
+      this.hasRelationTypeDefined(relationType)
+    )
+      return this.relationsByType[relationType];
+    else return [];
   }
   /**
    *
@@ -188,8 +191,8 @@ class SpinalApplication extends globalType.Model {
    */
   getRelationsByNode(node) {
     if (node.hasAppDefined(this.name.get()))
-      return node.getRelationsByAppName(this.name.get())
-    else return []
+      return node.getRelationsByAppName(this.name.get());
+    else return [];
   }
   /**
    *
@@ -200,7 +203,7 @@ class SpinalApplication extends globalType.Model {
    * @memberof SpinalApplication
    */
   getRelationsByNodeByType(node, relationType) {
-    return node.getRelationsByAppNameByType(this.name.get(), relationType)
+    return node.getRelationsByAppNameByType(this.name.get(), relationType);
   }
   /**
    *returns the nodes of the system such as BIMElementNodes
@@ -209,13 +212,13 @@ class SpinalApplication extends globalType.Model {
    * @memberof SpinalApplication
    */
   getCenralNodes() {
-    let res =   []
+    let res = [];
     for (let i = 0; i < this.relationsLst.length; i++) {
       const relation = this.relationsLst[i];
-      let nodeList1 = relation.getNodeList1()
+      let nodeList1 = relation.getNodeList1();
       for (let j = 0; j < nodeList1.length; j++) {
         const node = nodeList1[j];
-        res.push(node)
+        res.push(node);
       }
     }
     return res;
@@ -228,18 +231,17 @@ class SpinalApplication extends globalType.Model {
    * @memberof SpinalApplication
    */
   getCenralNodesByRelationType(relationType) {
-    let res =   []
+    let res = [];
     for (let i = 0; i < this.relationsByType[relationType].length; i++) {
       const relation = this.relationsByType[relationType][i];
-      let nodeList1 = relation.getNodeList1()
+      let nodeList1 = relation.getNodeList1();
       for (let j = 0; j < nodeList1.length; j++) {
         const node = nodeList1[j];
-        res.push(node)
+        res.push(node);
       }
     }
     return res;
   }
-
 
   /**
    *
@@ -248,11 +250,11 @@ class SpinalApplication extends globalType.Model {
    * @memberof SpinalApplication
    */
   async getCenralNodesElements() {
-    let res =   []
-    let centralNodes = this.getCenralNodes()
+    let res = [];
+    let centralNodes = this.getCenralNodes();
     for (let index = 0; index < centralNodes.length; index++) {
       const centralNode = centralNodes[index];
-      res.push(await Utilities.promiseLoad(centralNode.element))
+      res.push(await Utilities.promiseLoad(centralNode.element));
     }
     return res;
   }
@@ -264,15 +266,14 @@ class SpinalApplication extends globalType.Model {
    * @memberof SpinalApplication
    */
   async getCenralNodesElementsByRelationType(relationType) {
-    let res =   []
-    let centralNodes = this.getCenralNodesByRelationType(relationType)
+    let res = [];
+    let centralNodes = this.getCenralNodesByRelationType(relationType);
     for (let index = 0; index < centralNodes.length; index++) {
       const centralNode = centralNodes[index];
-      res.push(await Utilities.promiseLoad(centralNode.element))
+      res.push(await Utilities.promiseLoad(centralNode.element));
     }
     return res;
   }
-
 
   /**
    *
@@ -282,14 +283,14 @@ class SpinalApplication extends globalType.Model {
    * @memberof SpinalApplication
    */
   async getAssociatedElementsByNode(node) {
-    let res = []
+    let res = [];
     let relations = this.getRelationsByNode(node);
     for (let i = 0; i < relations.length; i++) {
       const relation = relations[i];
-      const nodeList2 = relation.getNodeList2()
+      const nodeList2 = relation.getNodeList2();
       for (let j = 0; j < nodeList2.length; j++) {
         const node = nodeList2[j];
-        res.push(await Utilities.promiseLoad(node.element))
+        res.push(await Utilities.promiseLoad(node.element));
       }
     }
     return res;
@@ -303,20 +304,71 @@ class SpinalApplication extends globalType.Model {
    * @memberof SpinalApplication
    */
   async getAssociatedElementsByNodeByRelationType(node, relationType) {
-    let res = []
+    let res = [];
     let relations = this.getRelationsByNodeByType(node, relationType);
     for (let i = 0; i < relations.length; i++) {
       const relation = relations[i];
-      const nodeList2 = relation.getNodeList2()
+      const nodeList2 = relation.getNodeList2();
       for (let j = 0; j < nodeList2.length; j++) {
         const node = nodeList2[j];
-        res.push(await Utilities.promiseLoad(node.element))
+        res.push(await Utilities.promiseLoad(node.element));
       }
     }
     return res;
   }
+  /**
+   *
+   * @returns an array of relation types
+   *
+   * @memberof SpinalApplication
+   */
+  getRelationTypes() {
+    let res = [];
+    for (let index = 0; index < this.relationsTypesLst.length; index++) {
+      const element = this.relationsTypesLst[index];
+      res.push(element);
+    }
+    return res;
+  }
 
-
+  /**
+   *
+   *
+   * @param {boolean} onlyDirected
+   * @returns an array of relation types that are really used
+   * @memberof SpinalApplication
+   */
+  getUsedRelationTypes(onlyDirected) {
+    let res = [];
+    for (let index = 0; index < this.relationsTypesLst.length; index++) {
+      const relationType = this.relationsTypesLst[index];
+      if (typeof this.relationsByType[relationType] !== "undefined") {
+        let relation = this.relationsByType[relationType][0];
+        if (onlyDirected) {
+          if (relation.isDirected.get()) {
+            res.push(relationType);
+          }
+        } else res.push(relationType);
+      }
+    }
+    return res;
+  }
+  /**
+   *
+   *
+   * @returns an array of relation types that are never used in this application
+   * @memberof SpinalApplication
+   */
+  getNotUsedRelationTypes() {
+    let res = [];
+    for (let index = 0; index < this.relationsTypesLst.length; index++) {
+      const relationType = this.relationsTypesLst[index];
+      if (typeof this.relationsByType[relationType] === "undefined") {
+        res.push(relationType);
+      }
+    }
+    return res;
+  }
 }
 export default SpinalApplication;
-spinalCore.register_models([SpinalApplication])
+spinalCore.register_models([SpinalApplication]);

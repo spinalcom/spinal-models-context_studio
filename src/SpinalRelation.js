@@ -101,7 +101,7 @@ export default class SpinalRelation extends globalType.Model {
   }
 
   addNotExistingNodetoRelation(_relation) {
-    other = [];
+    let other = [];
     for (let index = 0; index < _relation.nodeList1.length; index++) {
       const element = _relation.nodeList1[index];
       other.push(element);
@@ -111,7 +111,7 @@ export default class SpinalRelation extends globalType.Model {
       other.push(element);
     }
 
-    me = [];
+    let me = [];
     for (let index = 0; index < this.nodeList1.length; index++) {
       const element = this.nodeList1[index];
       me.push(element);

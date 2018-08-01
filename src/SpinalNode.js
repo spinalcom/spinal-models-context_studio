@@ -206,6 +206,8 @@ class SpinalNode extends globalType.Model {
    * @memberof SpinalNode
    */
   addRelationByApp(relation, name, appName) {
+    console.log("test");
+
     if (this.relatedGraph.hasReservationCredentials(relation.type.get(),
         appName)) {
       if (this.relatedGraph.containsApp(appName)) {
@@ -451,7 +453,7 @@ class SpinalNode extends globalType.Model {
   }
 
   /**
-   *
+   *  parent remove the child for now
    *
    * @param {string | SpinalApplication} app
    * @param {string | SpinalRelation} relation
@@ -477,10 +479,13 @@ class SpinalNode extends globalType.Model {
     let relations = this.getRelationsByAppNameByType(appName, relationType)
     for (let index = 0; index < relations.length; index++) {
       const relation = relations[index];
-      if (relation.isDirected.get() === isDirected)
+      if (relation.isDirected.get() === isDirected) {
         relation.removeFromNodeList2(node)
-    }
+        console.log(isDirected);
 
+        node.removeRelation(relation, app, isDirected)
+      }
+    }
   }
 
 
@@ -558,14 +563,25 @@ class SpinalNode extends globalType.Model {
   //     this.addRelation(_relations[index]);
   //   }
   // }
+
   /**
    *
    *
    * @returns all the relations of this Node
    * @memberof SpinalNode
    */
-  getRelations() {
+  getRelations(relationType) {
     let res = [];
+    if (typeof relationType != "undefined") {
+      if (typeof this.relations[relationType] != "undefined") {
+        let relList = this.relations[relationType]
+        for (let j = 0; j < relList.length; j++) {
+          const relation = relList[j];
+          res.push(relation);
+        }
+      }
+      return res
+    }
     for (let i = 0; i < this.relations._attribute_names.length; i++) {
       const relList = this.relations[this.relations._attribute_names[i]];
       for (let j = 0; j < relList.length; j++) {
@@ -589,14 +605,14 @@ class SpinalNode extends globalType.Model {
       !type.includes("-", type.length - 2)
     ) {
       let t1 = type.concat(">");
-      res = Utilities.concat(res, this.getRelations(t1));
+      res = res.concat(this.getRelations(t1));
       let t2 = type.concat("<");
-      res = Utilities.concat(res, this.getRelations(t2));
+      res = res.concat(this.getRelations(t2));
       let t3 = type.concat("-");
-      res = Utilities.concat(res, this.getRelations(t3));
+      res = res.concat(this.getRelations(t3));
     }
-    if (typeof this.relations[type] !== "undefined") res = this.relations[
-      type];
+    // if (typeof this.relations[type] !== "undefined") res = this.relations[
+    //   type];
     return res;
   }
   /**
@@ -719,17 +735,33 @@ class SpinalNode extends globalType.Model {
     return false;
   }
 
-  //TODO getChildren, getParent
+  //TODO getParent
   /**
    *
    *
+   * @param {string | SpinalApplication} appName - optional
    * @param {string} relationType - optional
    * @returns a list of neighbors nodes 
    * @memberof SpinalNode
    */
-  getNeighbors(relationType) {
+  getNeighbors(relationType, app) {
+    let appName = ""
+    if (typeof app != "string")
+      appName = app.name.get()
+    else
+      appName = app
     let neighbors = [];
-    let relations = this.getRelations(relationType);
+    let relations = null
+    if (typeof relationType == "undefined" && typeof appName == "undefined")
+      relations = this.getRelations();
+    else if (typeof relationType != "undefined" && typeof appName ==
+      "undefined")
+      relations = this.getRelationsByType(relationType);
+    else if (typeof relationType == "undefined" && typeof appName !=
+      "undefined")
+      relations = this.getRelationsByApp(appName);
+    else
+      relations = this.getRelationsByAppNameByType(appName, relationType);
     for (let index = 0; index < relations.length; index++) {
       const relation = relations[index];
       if (relation.isDirected.get()) {
@@ -750,9 +782,17 @@ class SpinalNode extends globalType.Model {
     return neighbors;
   }
 
+
+  /**
+   *
+   *
+   * @param {SpinalApplication | string} app
+   * @returns boolean
+   * @memberof SpinalNode
+   */
   getChildrenByApp(app) {
     let res = []
-    if (this.hasChildren()) {
+    if (this.hasChildren(app)) {
       let relations = this.getRelationsByApp(app, true);
       for (let index = 0; index < relations.length; index++) {
         const relation = relations[index];
@@ -761,13 +801,32 @@ class SpinalNode extends globalType.Model {
     }
     return res
   }
+
   /**
    *
    *
+   * @param {SpinalApplication| string} app
    * @returns boolean
    * @memberof SpinalNode
    */
-  hasChildren() {
+  hasChildren(app) {
+    if (typeof app != "undefined") {
+      let appName = ""
+      if (typeof app != "string")
+        appName = app.name.get()
+      else
+        appName = app
+      if (this.hasAppDefined(appName)) {
+        for (let index = 0; index < this.apps[appName]._attribute_names.length; index++) {
+          const prop = this.apps[appName]._attribute_names[index]
+          const relationLst = this.apps[appName][prop];
+          if (prop.includes(">", prop.length - 2))
+            if (relationLst.length > 0)
+              return true
+        }
+      }
+      return false;
+    }
     for (let index = 0; index < this.relations._attribute_names.length; index++) {
       const relationsName = this.relations._attribute_names[index];
       if (relationsName.includes(">", relationsName.length - 2))
@@ -849,7 +908,7 @@ class SpinalNode extends globalType.Model {
    *
    *
    * @param {string | SpinalApplication} app
-   * @param {string | SpinalRelation} relationType
+   * @param {string | SpinalRelation|[string]|[SpinalRelation]} relationType
    * @returns array of spinalNode
    * @memberof SpinalNode
    */
@@ -861,7 +920,13 @@ class SpinalNode extends globalType.Model {
       appName = app.name.get()
     else
       appName = app
-    if (typeof relation != "string")
+    if (Array.isArray(relation)) {
+      for (let index = 0; index < relation.length; index++) {
+        const rel = relation[index];
+        res = res.concat(this.getChildrenByAppByRelation(app, rel))
+      }
+      return res;
+    } else if (typeof relation != "string")
       relationType = relation.type.get()
     else
       relationType = relation
@@ -946,19 +1011,51 @@ class SpinalNode extends globalType.Model {
       }
     return res
   }
+
   /**
    *
    *
-   * @param {SpinalRelation} _relation
+   * @param {SpinalRelation | string} relation
+   * @param {SpinalApplication | string} app - optional
+   * @param {boolean} isDirected - optional
    * @memberof SpinalNode
    */
-  removeRelation(_relation) {
-    let relationLst = this.relations[_relation.type.get()];
-    for (let index = 0; index < relationLst.length; index++) {
-      const candidateRelation = relationLst[index];
-      if (_relation.id.get() === candidateRelation.id.get())
-        relationLst.splice(index, 1);
+  removeRelation(relation, app, isDirected) {
+    let relationType = ""
+    if (typeof relation != 'string')
+      relationType = relation.type.get()
+    else relationType = relation
+
+    let appName = ""
+    if (typeof app != 'string')
+      appName = app.name.get()
+    else appName = app
+
+    if (typeof isDirected != "undefined")
+      if (isDirected)
+        relationType = relationType.concat('<')
+    else
+      relationType = relationType.concat('-')
+    console.log(relationType);
+
+    if (typeof this.relations[relationType] != "undefined") {
+      let relationLst = this.relations[relationType];
+      for (let index = 0; index < relationLst.length; index++) {
+        const candidateRelation = relationLst[index];
+        if (relation.id.get() === candidateRelation.id.get())
+          relationLst.splice(index, 1);
+      }
     }
+    if (this.hasAppDefined(appName) &&
+      typeof this.apps[appName][relationType] != "undefined") {
+      let relationLst = this.apps[appName][relationType];
+      for (let index = 0; index < relationLst.length; index++) {
+        const candidateRelation = relationLst[index];
+        if (relation.id.get() === candidateRelation.id.get())
+          relationLst.splice(index, 1);
+      }
+    }
+
   }
   /**
    *
