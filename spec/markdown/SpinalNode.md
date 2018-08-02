@@ -7,6 +7,7 @@
 
 * [SpinalNode](#SpinalNode) ⇐ <code>Model</code>
     * _instance_
+        * [.addType(appName, type)](#SpinalNode+addType)
         * [.getAppsNames()](#SpinalNode+getAppsNames) ⇒
         * [.getElement()](#SpinalNode+getElement) ⇒
         * [.getApps()](#SpinalNode+getApps) ⇒
@@ -17,24 +18,28 @@
         * [.addRelation(relation, name)](#SpinalNode+addRelation)
         * [.addRelationByApp(relation, name, appName)](#SpinalNode+addRelationByApp)
         * [.addSimpleRelation(relationType, element, [isDirected])](#SpinalNode+addSimpleRelation) ⇒
-        * [.addSimpleRelationByApp(appName, relationType, element, [isDirected])](#SpinalNode+addSimpleRelationByApp) ⇒
+        * [.addSimpleRelationByApp(appName, relationType, element, [isDirected], [asNode])](#SpinalNode+addSimpleRelationByApp) ⇒
         * [.addToExistingRelation(relationType, element, [isDirected], [asParent])](#SpinalNode+addToExistingRelation) ⇒
-        * [.addToExistingRelationByApp(appName, relationType, element, [isDirected], [asParent])](#SpinalNode+addToExistingRelationByApp) ⇒
+        * [.addToExistingRelationByApp(appName, relationType, element, [isDirected], [asParent], [asNode])](#SpinalNode+addToExistingRelationByApp) ⇒
+        * [.removeFromExistingRelationByApp(app, relation, node, [isDirected])](#SpinalNode+removeFromExistingRelationByApp)
         * [._classifyRelation(_relation)](#SpinalNode+_classifyRelation)
         * [.getRelations()](#SpinalNode+getRelations) ⇒
         * [.getRelationsByType(type)](#SpinalNode+getRelationsByType) ⇒
-        * [.getRelationsByAppName(appName)](#SpinalNode+getRelationsByAppName) ⇒
-        * [.getRelationsByApp(app)](#SpinalNode+getRelationsByApp) ⇒
+        * [.getRelationsByAppName(appName, asParent)](#SpinalNode+getRelationsByAppName) ⇒
+        * [.getRelationsByApp(app, asParent)](#SpinalNode+getRelationsByApp) ⇒
         * [.getRelationsByAppNameByType(appName, relationType)](#SpinalNode+getRelationsByAppNameByType) ⇒
         * [.getRelationsByAppByType(app, relationType)](#SpinalNode+getRelationsByAppByType) ⇒
         * [.inNodeList(_nodelist)](#SpinalNode+inNodeList) ⇒
-        * [.getNeighbors(relationType)](#SpinalNode+getNeighbors) ⇒
+        * [.getNeighbors(appName, relationType)](#SpinalNode+getNeighbors) ⇒
+        * [.getChildrenByApp(app)](#SpinalNode+getChildrenByApp) ⇒
+        * [.hasChildren(app)](#SpinalNode+hasChildren) ⇒
         * [.getChildrenByRelationType(relationType)](#SpinalNode+getChildrenByRelationType) ⇒
-        * [.getChildrenByAppByRelation(appName, relationType)](#SpinalNode+getChildrenByAppByRelation) ⇒
+        * [.isParent(relation)](#SpinalNode+isParent) ⇒
+        * [.getChildrenByAppByRelation(app, relationType)](#SpinalNode+getChildrenByAppByRelation) ⇒
         * [.getChildrenElementsByAppByRelation(appName, relationType)](#SpinalNode+getChildrenElementsByAppByRelation) ⇒
         * [.getChildrenElementsByRelationType(relationType)](#SpinalNode+getChildrenElementsByRelationType) ⇒
         * [.getParentsByRelationType(relationType)](#SpinalNode+getParentsByRelationType) ⇒
-        * [.removeRelation(_relation)](#SpinalNode+removeRelation)
+        * [.removeRelation(relation, app, isDirected)](#SpinalNode+removeRelation)
         * [.removeRelations(_relations)](#SpinalNode+removeRelations)
         * [.removeRelationType(relationType)](#SpinalNode+removeRelationType)
         * [.hasAppDefined(appName)](#SpinalNode+hasAppDefined) ⇒
@@ -45,6 +50,16 @@
     * _static_
         * [.SpinalNode](#SpinalNode.SpinalNode)
             * [new SpinalNode(name, element, relatedGraph, relations, [name])](#new_SpinalNode.SpinalNode_new)
+
+<a name="SpinalNode+addType"></a>
+
+### spinalNode.addType(appName, type)
+**Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
+
+| Param | Type |
+| --- | --- |
+| appName | <code>string</code> | 
+| type | <code>string</code> | 
 
 <a name="SpinalNode+getAppsNames"></a>
 
@@ -131,16 +146,17 @@
 
 <a name="SpinalNode+addSimpleRelationByApp"></a>
 
-### spinalNode.addSimpleRelationByApp(appName, relationType, element, [isDirected]) ⇒
+### spinalNode.addSimpleRelationByApp(appName, relationType, element, [isDirected], [asNode]) ⇒
 **Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
 **Returns**: the created relation  
 
-| Param | Type | Default |
-| --- | --- | --- |
-| appName | <code>string</code> |  | 
-| relationType | <code>string</code> |  | 
-| element | <code>Model</code> |  | 
-| [isDirected] | <code>boolean</code> | <code>false</code> | 
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| appName | <code>string</code> |  |  |
+| relationType | <code>string</code> |  |  |
+| element | <code>Model</code> \| [<code>SpinalNode</code>](#SpinalNode) |  |  |
+| [isDirected] | <code>boolean</code> | <code>false</code> |  |
+| [asNode] | <code>boolean</code> | <code>false</code> | to put a SpinalNode inside a SpinalNode |
 
 <a name="SpinalNode+addToExistingRelation"></a>
 
@@ -157,7 +173,7 @@
 
 <a name="SpinalNode+addToExistingRelationByApp"></a>
 
-### spinalNode.addToExistingRelationByApp(appName, relationType, element, [isDirected], [asParent]) ⇒
+### spinalNode.addToExistingRelationByApp(appName, relationType, element, [isDirected], [asParent], [asNode]) ⇒
 **Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
 **Returns**: an Object of 1)relation:the relation with the added element node in (nodeList2), 2)node: the created node  
 
@@ -165,9 +181,24 @@
 | --- | --- | --- | --- |
 | appName | <code>string</code> |  |  |
 | relationType | <code>string</code> |  |  |
-| element | <code>Model</code> |  | any subclass of Model |
+| element | <code>Model</code> \| [<code>SpinalNode</code>](#SpinalNode) |  | Model:any subclass of Model |
 | [isDirected] | <code>boolean</code> | <code>false</code> |  |
 | [asParent] | <code>boolean</code> | <code>false</code> |  |
+| [asNode] | <code>boolean</code> | <code>false</code> | to put a SpinalNode inside a SpinalNode |
+
+<a name="SpinalNode+removeFromExistingRelationByApp"></a>
+
+### spinalNode.removeFromExistingRelationByApp(app, relation, node, [isDirected])
+parent remove the child for now
+
+**Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
+
+| Param | Type | Default |
+| --- | --- | --- |
+| app | <code>string</code> \| <code>SpinalApplication</code> |  | 
+| relation | <code>string</code> \| <code>SpinalRelation</code> |  | 
+| node | [<code>SpinalNode</code>](#SpinalNode) |  | 
+| [isDirected] | <code>boolean</code> | <code>false</code> | 
 
 <a name="SpinalNode+_classifyRelation"></a>
 
@@ -195,23 +226,25 @@
 
 <a name="SpinalNode+getRelationsByAppName"></a>
 
-### spinalNode.getRelationsByAppName(appName) ⇒
+### spinalNode.getRelationsByAppName(appName, asParent) ⇒
 **Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
-**Returns**: all relations of a specific app  
+**Returns**: an array of all relations of a specific app for this node  
 
 | Param | Type |
 | --- | --- |
 | appName | <code>string</code> | 
+| asParent | <code>string</code> | 
 
 <a name="SpinalNode+getRelationsByApp"></a>
 
-### spinalNode.getRelationsByApp(app) ⇒
+### spinalNode.getRelationsByApp(app, asParent) ⇒
 **Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
 **Returns**: all relations of a specific app  
 
 | Param | Type |
 | --- | --- |
-| app | <code>SpinalApplication</code> | 
+| app | <code>SpinalApplication</code> \| <code>string</code> | 
+| asParent | <code>string</code> | 
 
 <a name="SpinalNode+getRelationsByAppNameByType"></a>
 
@@ -249,13 +282,34 @@ verify if an element is already in given nodeList
 
 <a name="SpinalNode+getNeighbors"></a>
 
-### spinalNode.getNeighbors(relationType) ⇒
+### spinalNode.getNeighbors(appName, relationType) ⇒
 **Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
 **Returns**: a list of neighbors nodes  
 
 | Param | Type | Description |
 | --- | --- | --- |
+| appName | <code>string</code> \| <code>SpinalApplication</code> | optional |
 | relationType | <code>string</code> | optional |
+
+<a name="SpinalNode+getChildrenByApp"></a>
+
+### spinalNode.getChildrenByApp(app) ⇒
+**Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
+**Returns**: boolean  
+
+| Param | Type |
+| --- | --- |
+| app | <code>SpinalApplication</code> \| <code>string</code> | 
+
+<a name="SpinalNode+hasChildren"></a>
+
+### spinalNode.hasChildren(app) ⇒
+**Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
+**Returns**: boolean  
+
+| Param | Type |
+| --- | --- |
+| app | <code>SpinalApplication</code> \| <code>string</code> | 
 
 <a name="SpinalNode+getChildrenByRelationType"></a>
 
@@ -267,15 +321,25 @@ verify if an element is already in given nodeList
 | --- | --- |
 | relationType | <code>string</code> | 
 
+<a name="SpinalNode+isParent"></a>
+
+### spinalNode.isParent(relation) ⇒
+**Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
+**Returns**: boolean  
+
+| Param | Type |
+| --- | --- |
+| relation | <code>SpinalRelation</code> | 
+
 <a name="SpinalNode+getChildrenByAppByRelation"></a>
 
-### spinalNode.getChildrenByAppByRelation(appName, relationType) ⇒
+### spinalNode.getChildrenByAppByRelation(app, relationType) ⇒
 **Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
 **Returns**: array of spinalNode  
 
 | Param | Type |
 | --- | --- |
-| appName | <code>string</code> \| <code>SpinalApplication</code> | 
+| app | <code>string</code> \| <code>SpinalApplication</code> | 
 | relationType | <code>string</code> \| <code>SpinalRelation</code> | 
 
 <a name="SpinalNode+getChildrenElementsByAppByRelation"></a>
@@ -311,12 +375,14 @@ verify if an element is already in given nodeList
 
 <a name="SpinalNode+removeRelation"></a>
 
-### spinalNode.removeRelation(_relation)
+### spinalNode.removeRelation(relation, app, isDirected)
 **Kind**: instance method of [<code>SpinalNode</code>](#SpinalNode)  
 
-| Param | Type |
-| --- | --- |
-| _relation | <code>SpinalRelation</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| relation | <code>SpinalRelation</code> \| <code>string</code> |  |
+| app | <code>SpinalApplication</code> \| <code>string</code> | optional |
+| isDirected | <code>boolean</code> | optional |
 
 <a name="SpinalNode+removeRelations"></a>
 

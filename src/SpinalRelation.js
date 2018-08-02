@@ -4,7 +4,9 @@ let getViewer = function() {
   return globalType.v;
 };
 
-import { Utilities } from "./Utilities";
+import {
+  Utilities
+} from "./Utilities";
 
 export default class SpinalRelation extends globalType.Model {
   constructor(
@@ -92,8 +94,6 @@ export default class SpinalRelation extends globalType.Model {
   }
 
   addNotExistingNodestoNodeList2(_nodes) {
-    console.log(_nodes);
-
     for (let index = 0; index < _nodes.length; index++) {
       const element = _nodes[index];
       this.addNotExistingNodetoNodeList2(element);

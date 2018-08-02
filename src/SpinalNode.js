@@ -206,8 +206,6 @@ class SpinalNode extends globalType.Model {
    * @memberof SpinalNode
    */
   addRelationByApp(relation, name, appName) {
-    console.log("test");
-
     if (this.relatedGraph.hasReservationCredentials(relation.type.get(),
         appName)) {
       if (this.relatedGraph.containsApp(appName)) {
@@ -481,8 +479,6 @@ class SpinalNode extends globalType.Model {
       const relation = relations[index];
       if (relation.isDirected.get() === isDirected) {
         relation.removeFromNodeList2(node)
-        console.log(isDirected);
-
         node.removeRelation(relation, app, isDirected)
       }
     }
@@ -908,7 +904,7 @@ class SpinalNode extends globalType.Model {
    *
    *
    * @param {string | SpinalApplication} app
-   * @param {string | SpinalRelation|[string]|[SpinalRelation]} relationType
+   * @param {string | SpinalRelation} relationType
    * @returns array of spinalNode
    * @memberof SpinalNode
    */
@@ -1036,8 +1032,6 @@ class SpinalNode extends globalType.Model {
         relationType = relationType.concat('<')
     else
       relationType = relationType.concat('-')
-    console.log(relationType);
-
     if (typeof this.relations[relationType] != "undefined") {
       let relationLst = this.relations[relationType];
       for (let index = 0; index < relationLst.length; index++) {

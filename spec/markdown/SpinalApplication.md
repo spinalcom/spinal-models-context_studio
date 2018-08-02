@@ -23,6 +23,9 @@
         * [.getCenralNodesElementsByRelationType(relationType)](#SpinalApplication+getCenralNodesElementsByRelationType) ⇒
         * [.getAssociatedElementsByNode(node)](#SpinalApplication+getAssociatedElementsByNode) ⇒
         * [.getAssociatedElementsByNodeByRelationType(node, relationType)](#SpinalApplication+getAssociatedElementsByNodeByRelationType) ⇒
+        * [.getRelationTypes()](#SpinalApplication+getRelationTypes) ⇒
+        * [.getUsedRelationTypes(onlyDirected)](#SpinalApplication+getUsedRelationTypes) ⇒
+        * [.getNotUsedRelationTypes()](#SpinalApplication+getNotUsedRelationTypes) ⇒
     * _static_
         * [.SpinalApplication](#SpinalApplication.SpinalApplication)
             * [new SpinalApplication(name, relationsTypesLst, relatedGraph, [name])](#new_SpinalApplication.SpinalApplication_new)
@@ -181,6 +184,26 @@ returns the nodes of the system such as BIMElementNodes
 | node | <code>SpinalNode</code> | 
 | relationType | <code>string</code> | 
 
+<a name="SpinalApplication+getRelationTypes"></a>
+
+### spinalApplication.getRelationTypes() ⇒
+**Kind**: instance method of [<code>SpinalApplication</code>](#SpinalApplication)  
+**Returns**: an array of relation types  
+<a name="SpinalApplication+getUsedRelationTypes"></a>
+
+### spinalApplication.getUsedRelationTypes(onlyDirected) ⇒
+**Kind**: instance method of [<code>SpinalApplication</code>](#SpinalApplication)  
+**Returns**: an array of relation types that are really used  
+
+| Param | Type |
+| --- | --- |
+| onlyDirected | <code>boolean</code> | 
+
+<a name="SpinalApplication+getNotUsedRelationTypes"></a>
+
+### spinalApplication.getNotUsedRelationTypes() ⇒
+**Kind**: instance method of [<code>SpinalApplication</code>](#SpinalApplication)  
+**Returns**: an array of relation types that are never used in this application  
 <a name="SpinalApplication.SpinalApplication"></a>
 
 ### SpinalApplication.SpinalApplication

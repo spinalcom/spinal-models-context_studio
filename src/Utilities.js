@@ -56,8 +56,6 @@ Utilities.arraysEqual = function(arrayA, arrayB) {
   if (arrayA == null || arrayB == null) return false;
   if (arrayA.length != arrayB.length) return false;
   arrayA.sort();
-  console.log(arrayA);
-
   arrayB.sort();
   for (var i = 0; i < arrayA.length; ++i) {
     if (arrayA[i] !== arrayB[i]) return false;
