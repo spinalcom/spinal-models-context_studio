@@ -9,6 +9,7 @@ import SpinalContext from "./SpinalContext";
 import SpinalNetwork from "./SpinalNetwork";
 import SpinalDevice from "./SpinalDevice";
 import SpinalEndpoint from "./SpinalEndpoint";
+import TimeSeries from "./TimeSeries";
 
 import {
   Utilities
@@ -57,6 +58,7 @@ class SpinalGraph extends globalType.Model {
     globalType.spinal.contextStudio.SpinalNetwork = SpinalNetwork;
     globalType.spinal.contextStudio.SpinalDevice = SpinalDevice;
     globalType.spinal.contextStudio.SpinalEndpoint = SpinalEndpoint;
+    globalType.spinal.contextStudio.TimeSeries = TimeSeries;
     globalType.spinal.contextStudio.Utilities = Utilities;
   }
   /**
