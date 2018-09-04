@@ -32,11 +32,11 @@ Utilities.promiseGetExternalIdMapping = function(_externalId) {
   });
 };
 
-Utilities.promiseLoad = function(_ptr) {
-  return new Promise(resolve => {
-    _ptr.load(resolve);
-  });
-};
+// Utilities.promiseLoad = function(_ptr) {
+//   return new Promise(resolve => {
+//     _ptr.load(resolve);
+//   });
+// };
 // Utilities.promiseLoad = function(_ptr) {
 //   return new Promise(resolve => {
 //     _ptr.load(resolve);
