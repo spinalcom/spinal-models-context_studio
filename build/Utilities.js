@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 let Utilities = {};
 const globalType = typeof window === "undefined" ? global : window;
 
-Utilities.getViewer = function () {
+Utilities.getViewer = function() {
   return new Promise((resolve, reject) => {
     if (globalType.v === "undefined") {
       let interval = setInterval(() => {
@@ -19,7 +19,7 @@ Utilities.getViewer = function () {
   });
 };
 
-Utilities.promiseGetProperties = function (_dbId) {
+Utilities.promiseGetProperties = function(_dbId) {
   return new Promise(resolve => {
     Utilities.getViewer().then(viewer => {
       viewer.getProperties(_dbId, resolve);
@@ -27,7 +27,7 @@ Utilities.promiseGetProperties = function (_dbId) {
   });
 };
 
-Utilities.promiseGetExternalIdMapping = function (_externalId) {
+Utilities.promiseGetExternalIdMapping = function(_externalId) {
   return new Promise(resolve => {
     Utilities.getViewer().then(viewer => {
       viewer.model.getExternalIdMapping(res => {
@@ -42,23 +42,26 @@ Utilities.promiseGetExternalIdMapping = function (_externalId) {
 //     _ptr.load(resolve);
 //   });
 // }
-Utilities.promiseLoad = function (_ptr) {
-  if (_ptr instanceof globalType.Ptr && _ptr.data.value != 0 && typeof FileSystem._objects[_ptr.data.value] != "undefined") return Promise.resolve(FileSystem._objects[_ptr.data.value]);else return new Promise(resolve => {
+Utilities.promiseLoad = function(_ptr) {
+  if (_ptr instanceof globalType.Ptr && _ptr.data.value != 0 && typeof FileSystem
+    ._objects[_ptr.data.value] != "undefined") return Promise.resolve(
+    FileSystem._objects[_ptr.data.value]);
+  else return new Promise(resolve => {
     _ptr.load(resolve);
   });
 };
 
-Utilities.getExternalId = async function (_dbId) {
+Utilities.getExternalId = async function(_dbId) {
   let properties = await Utilities.promiseGetProperties(_dbId);
   return properties.externalId;
 };
 
-Utilities.getDbIdByExternalId = async function (_externalId) {
+Utilities.getDbIdByExternalId = async function(_externalId) {
   let dbid = await Utilities.promiseGetExternalIdMapping(_externalId);
   return dbid;
 };
 
-Utilities.arraysEqual = function (arrayA, arrayB) {
+Utilities.arraysEqual = function(arrayA, arrayB) {
   if (arrayA === arrayB) return true;
   if (arrayA == null || arrayB == null) return false;
   if (arrayA.length != arrayB.length) return false;
@@ -70,7 +73,7 @@ Utilities.arraysEqual = function (arrayA, arrayB) {
   return true;
 };
 
-Utilities.containsLstById = function (_list, _node) {
+Utilities.containsLstById = function(_list, _node) {
   for (let index = 0; index < _list.length; index++) {
     const element = _list[index];
     if (element.id.get() == _node.id.get()) return true;
@@ -78,7 +81,7 @@ Utilities.containsLstById = function (_list, _node) {
   return false;
 };
 
-Utilities.containsLstModel = function (_list, _model) {
+Utilities.containsLstModel = function(_list, _model) {
   for (let index = 0; index < _list.length; index++) {
     const element = _list[index];
     if (element.get() == _model.get()) return true;
@@ -86,7 +89,7 @@ Utilities.containsLstModel = function (_list, _model) {
   return false;
 };
 
-Utilities.containsLst = function (_list, _element) {
+Utilities.containsLst = function(_list, _element) {
   for (let index = 0; index < _list.length; index++) {
     const element = _list[index];
     if (element.get() == _element) return true;
@@ -94,15 +97,15 @@ Utilities.containsLst = function (_list, _element) {
   return false;
 };
 
-Utilities.include = function (arr, obj) {
+Utilities.include = function(arr, obj) {
   return arr.indexOf(obj) != -1;
 };
 
-Utilities.getIndex = function (arr, obj) {
+Utilities.getIndex = function(arr, obj) {
   return arr.indexOf(obj);
 };
 
-Utilities.getIds = function (array) {
+Utilities.getIds = function(array) {
   let res = [];
   for (let index = 0; index < array.length; index++) {
     res.push(array[index].id.get());
@@ -113,7 +116,7 @@ Utilities.getIds = function (array) {
 //   return (arr.indexOf(obj));
 // }
 
-Utilities.concat = function (listA, listB) {
+Utilities.concat = function(listA, listB) {
   let res = [];
   for (let index = 0; index < listA.length; index++) {
     res.push(listA[index]);
@@ -124,7 +127,7 @@ Utilities.concat = function (listA, listB) {
   return res;
 };
 
-Utilities.allButMeById = function (_list, _node) {
+Utilities.allButMeById = function(_list, _node) {
   let res = [];
   for (let index = 0; index < _list.length; index++) {
     const node = _list[index];
@@ -135,15 +138,17 @@ Utilities.allButMeById = function (_list, _node) {
   }
 };
 
-Utilities.guid = function (_constructor) {
-  return _constructor + "-" + this.s4() + this.s4() + "-" + this.s4() + "-" + this.s4() + "-" + this.s4() + "-" + this.s4() + this.s4() + this.s4() + "-" + Date.now().toString(16);
+Utilities.guid = function(_constructor) {
+  return _constructor + "-" + this.s4() + this.s4() + "-" + this.s4() + "-" +
+    this.s4() + "-" + this.s4() + "-" + this.s4() + this.s4() + this.s4() +
+    "-" + Date.now().toString(16);
 };
 
-Utilities.s4 = function () {
+Utilities.s4 = function() {
   return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 };
 
-Utilities.putOnTopLst = function (lst, elementB) {
+Utilities.putOnTopLst = function(lst, elementB) {
   lst.remove_ref(elementB);
   lst.unshift(elementB);
   // for (let index = 0; index < lst.length; index++) {

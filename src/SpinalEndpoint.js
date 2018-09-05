@@ -43,7 +43,7 @@ class SpinalEndpoint extends globalType.Model {
           "Unsigned8", "Unsigned16", "Unsigned32", "Integer",
           "Integer16", "Real", "Double", "OctetString",
           "CharacterString", "BitString", "Enumerated", "Date",
-          "Time", "Array"
+          "Time", "Array","DateTime","Long","String","Duration"
         ]),
         min: min,
         max: max,
