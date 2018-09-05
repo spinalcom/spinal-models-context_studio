@@ -1,7 +1,9 @@
 const spinalCore = require("spinal-core-connectorjs");
 const globalType = typeof window === "undefined" ? global : window;
 
-import { Utilities } from "./Utilities";
+import {
+  Utilities
+} from "./Utilities";
 
 /**
  *
@@ -32,10 +34,22 @@ class SpinalApplication extends globalType.Model {
         relationsTypesLst: relationsTypesLst,
         relationsByType: new Model(),
         relationsLst: new Lst(),
-        relatedGraph: relatedGraph
+        relatedGraphPtr: new Ptr(relatedGraph),
       });
+      this.relatedGraph = relatedGraph;
     }
+
+    if (typeof this.relatedGraph == "undefined")
+      var interval = setInterval(() => {
+        if (typeof this.relatedGraphPtr !== "undefined") {
+          this.relatedGraphPtr.load(t => {
+            this.relatedGraph = t;
+            clearInterval(interval)
+          })
+        }
+      }, 100);
   }
+
   /**
    *
    *
@@ -77,8 +91,8 @@ class SpinalApplication extends globalType.Model {
     } else {
       console.log(
         relationType +
-          " is reserved by " +
-          this.reservedRelationsNames[relationType]
+        " is reserved by " +
+        this.reservedRelationsNames[relationType]
       );
     }
   }
@@ -113,8 +127,8 @@ class SpinalApplication extends globalType.Model {
     } else {
       console.log(
         relation.type.get() +
-          " is reserved by " +
-          this.reservedRelationsNames[relation.type.get()]
+        " is reserved by " +
+        this.reservedRelationsNames[relation.type.get()]
       );
     }
   }
@@ -131,9 +145,9 @@ class SpinalApplication extends globalType.Model {
     else {
       console.warn(
         this.name.get() +
-          " has not declared " +
-          relationType +
-          " as one of its relation Types."
+        " has not declared " +
+        relationType +
+        " as one of its relation Types."
       );
       return false;
     }
@@ -150,9 +164,9 @@ class SpinalApplication extends globalType.Model {
     else {
       console.warn(
         "relation " +
-          relationType +
-          " is not defined for app " +
-          this.name.get()
+        relationType +
+        " is not defined for app " +
+        this.name.get()
       );
       return false;
     }

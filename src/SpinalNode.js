@@ -34,10 +34,11 @@ class SpinalNode extends globalType.Model {
         element: new Ptr(element),
         relations: new Model(),
         apps: new Model(),
-        relatedGraph: relatedGraph
+        relatedGraphPtr: new Ptr(relatedGraph),
       });
-      if (typeof this.relatedGraph !== "undefined") {
-        this.relatedGraph.classifyNode(this);
+      this.relatedGraph = relatedGraph;
+      if (typeof relatedGraph !== "undefined") {
+        relatedGraph.classifyNode(this);
       }
       if (typeof relations !== "undefined") {
         if (Array.isArray(relations) || relations instanceof Lst)
@@ -45,7 +46,17 @@ class SpinalNode extends globalType.Model {
         else this.addRelation(relations);
       }
     }
+    if (typeof this.relatedGraph == "undefined")
+      var interval = setInterval(() => {
+        if (typeof this.relatedGraphPtr != "undefined") {
+          this.relatedGraphPtr.load(t => {
+            this.relatedGraph = t;
+            clearInterval(interval)
+          })
+        }
+      }, 100);
   }
+
   /**
    *
    * @param {string} appName
@@ -783,7 +794,7 @@ class SpinalNode extends globalType.Model {
    *
    *
    * @param {SpinalApplication | string} app
-   * @returns boolean
+   * @returns an Array of all children
    * @memberof SpinalNode
    */
   getChildrenByApp(app) {
@@ -797,6 +808,27 @@ class SpinalNode extends globalType.Model {
     }
     return res
   }
+
+  /**
+   *
+   *
+   * @param {SpinalApplication | string} app
+   * @returns an Object of children filtered by relationType
+   * @memberof SpinalNode
+   */
+  getChildrenByAppFiltered(app) {
+    let res = {}
+    if (this.hasChildren(app)) {
+      let relations = this.getRelationsByApp(app, true);
+      for (let index = 0; index < relations.length; index++) {
+        const relation = relations[index];
+        res[relation.type.get()] = this.getChildrenByAppByRelation(app,
+          relation)
+      }
+    }
+    return res
+  }
+
 
   /**
    *

@@ -32,11 +32,23 @@ Utilities.promiseGetExternalIdMapping = function(_externalId) {
   });
 }
 
+// Utilities.promiseLoad = function(_ptr) {
+//   return new Promise(resolve => {
+//     _ptr.load(resolve);
+//   });
+// }
 Utilities.promiseLoad = function(_ptr) {
-  return new Promise(resolve => {
-    _ptr.load(resolve);
-  });
-}
+  if (
+    _ptr instanceof globalType.Ptr &&
+    _ptr.data.value != 0 &&
+    typeof FileSystem._objects[_ptr.data.value] != "undefined"
+  )
+    return Promise.resolve(FileSystem._objects[_ptr.data.value]);
+  else
+    return new Promise(resolve => {
+      _ptr.load(resolve);
+    });
+};
 
 
 
