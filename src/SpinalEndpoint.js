@@ -17,8 +17,8 @@ class SpinalEndpoint extends globalType.Model {
    * @param {number} [currentValue=0]
    * @param {string} [unit=""]
    * @param {string} [dataType="Null"]
-   * @param {number} [min=0]
-   * @param {number} [max=0]
+   * @param {Obj} [seuilMin={value: 0,active : false}]
+   * @param {Obj} [seuilMax={value:0,active: false}]
    * @param {string} [dataNature=""] example : temperature
    * @param {string} [name="SpinalEndpoint"]
    * @memberof SpinalEndpoint
@@ -43,10 +43,16 @@ class SpinalEndpoint extends globalType.Model {
           "Unsigned8", "Unsigned16", "Unsigned32", "Integer",
           "Integer16", "Real", "Double", "OctetString",
           "CharacterString", "BitString", "Enumerated", "Date",
-          "Time", "Array","DateTime","Long","String","Duration"
+          "Time", "Array", "DateTime", "Long", "String", "Duration"
         ]),
-        min: min,
-        max: max,
+        seuilMin: {
+          value: min,
+          active: false
+        },
+        seuilMax: {
+          value: max,
+          active: false
+        },
         dataNature: dataNature
       });
       if (typeof dataType !== "undefined")

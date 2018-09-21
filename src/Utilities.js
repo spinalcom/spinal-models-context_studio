@@ -23,18 +23,16 @@ Utilities.promiseGetProperties = function(_dbId) {
 };
 
 Utilities.promiseGetExternalIdMapping = function(_externalId) {
-    return new Promise(resolve => {
-      Utilities.getViewer().then(viewer => {
-        viewer.model.getExternalIdMapping(res => {
-          resolve(res[_externalId]);
-        });
+  return new Promise(resolve => {
+    Utilities.getViewer().then(viewer => {
+      viewer.model.getExternalIdMapping(res => {
+        resolve(res[_externalId]);
       });
-    }); <<
-    << << < HEAD
-  } ===
-  === =
-}; >>>
->>> > 54e2865314 e4587d821d2c0cd41f3e5abe4b207e
+    });
+  });
+
+}
+
 
 // Utilities.promiseLoad = function(_ptr) {
 //   return new Promise(resolve => {

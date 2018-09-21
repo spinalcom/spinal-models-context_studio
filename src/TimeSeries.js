@@ -1,6 +1,8 @@
 const spinalCore = require("spinal-core-connectorjs");
 const globalType = typeof window === "undefined" ? global : window;
-import { Utilities } from "./Utilities";
+import {
+  Utilities
+} from "./Utilities";
 /**
  *
  *
@@ -14,6 +16,7 @@ class TimeSeries extends globalType.Model {
    * @param {number} [windowSize=60]
    * @param {number} [frequence=5] - in second
    * @param {Lst} [history=new Lst()]
+   * @param {Lst} [historyDate=new Lst()]
    * @memberof TimeSeries
    */
   constructor(
@@ -21,6 +24,7 @@ class TimeSeries extends globalType.Model {
     windowSize = 60,
     frequence = 5, // in s
     history = new Lst(),
+    historyDate = new Lst(),
     name = "TimeSeries"
   ) {
     super();
@@ -30,18 +34,30 @@ class TimeSeries extends globalType.Model {
         name: _name,
         windowSize: windowSize,
         frequence: frequence,
-        history: history
+        history: history,
+        historyDate: historyDate
       });
     }
   }
 
   addToHistory(value) {
-    if (this.history.length < this.windowSize) {
-      this.history.push(value);
-    } else {
+    if (this.history.length >= this.windowSize) {
       this.history.splice(0, 1);
-      this.history.push(value);
+      this.historyDate.splice(0, 1);
     }
+
+    if (value) {
+      this.history.push(value);
+      this.historyDate.push(this.getDate());
+    }
+
+
+  }
+
+  getDate() {
+    var t = new Date();
+    return t.getFullYear() + "-" + (t.getMonth() + 1) + "-" + t.getDate() +
+      " " + t.getHours() + ":" + t.getMinutes() + ":" + t.getSeconds()
   }
 }
 export default TimeSeries;
