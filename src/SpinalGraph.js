@@ -64,7 +64,7 @@ class SpinalGraph extends globalType.Model {
   /**
    *
    *
-   * @param {number} _dbId
+   * @param {number} _dbId id of the object inside the svf (autodesk file)
    * @returns Promise of the corresponding Node or the created one if not existing
    * @memberof SpinalGraph
    */
