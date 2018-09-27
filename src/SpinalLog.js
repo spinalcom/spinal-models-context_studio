@@ -3,13 +3,21 @@ const globalType = typeof window === "undefined" ? global : window;
 import {
   Utilities
 } from "./Utilities";
+import SpinalEndpoint from "./SpinalEndpoint";
 /**
- *
- *
  * @class SpinalLog
  * @extends {Model}
  */
 class SpinalLog extends globalType.Model {
+  /**
+   * 
+   * @param {string} endpointName 
+   * @param {string} type 
+   * @param {string} user 
+   * @param {string} message 
+   * @param {SpinalEndpoint} endpointNode 
+   * @param {number} value 
+   */
   constructor(endpointName, type, user, message, endpointNode, value) {
     super();
     this.add_attr({
