@@ -349,7 +349,7 @@ class SpinalGraph extends globalType.Model {
     element,
     isDirected = false
   ) {
-    if (this.hasReservationCredentials(_relationType, appName)) {
+    if (this.hasReservationCredentials(relationType, appName)) {
       if (this.containsApp(appName)) {
         let node2 = this.addNode(element);
         let rel = new SpinalRelation(relationType, [node], [node2],
