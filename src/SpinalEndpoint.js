@@ -29,6 +29,8 @@ class SpinalEndpoint extends globalType.Model {
     max =
     0,
     dataNature = "",
+    alarmType,
+    oldAlarmType = "normal",
     name =
     "SpinalEndpoint") {
     super();
@@ -53,10 +55,16 @@ class SpinalEndpoint extends globalType.Model {
           value: max,
           active: false
         },
+        alarmType: new Choice(1, ["min", "normal", "max"]),
+        oldAlarmType: oldAlarmType,
         dataNature: dataNature
       });
+
       if (typeof dataType !== "undefined")
         this.dataType.set(dataType);
+
+      if (typeof alarmType !== "undefined")
+        this.dataType.set(alarmType);
     }
   }
 }

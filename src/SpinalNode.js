@@ -185,8 +185,11 @@ class SpinalNode extends globalType.Model {
    * @param {string} name
    * @memberof SpinalNode
    */
-  addRelation(relation, name) {
-    if (!this.relatedGraph.isReserved(relation.type.get())) {
+  addRelation(relation, name, argRelatedGraph = null) {
+    if (!argRelatedGraph)
+      argRelatedGraph = this.relatedGraph;
+
+    if (!argRelatedGraph.isReserved(relation.type.get())) {
       let nameTmp = relation.type.get();
       if (typeof name !== "undefined") {
         nameTmp = name;
@@ -204,7 +207,7 @@ class SpinalNode extends globalType.Model {
       console.log(
         relation.type.get() +
         " is reserved by " +
-        this.relatedGraph.reservedRelationsNames[relation.type.get()]
+        argRelatedGraph.reservedRelationsNames[relation.type.get()]
       );
     }
   }

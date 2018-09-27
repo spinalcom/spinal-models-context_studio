@@ -31,6 +31,7 @@ import SpinalNetwork from "./SpinalNetwork";
 import SpinalDevice from "./SpinalDevice";
 import SpinalEndpoint from "./SpinalEndpoint";
 import TimeSeries from "./TimeSeries";
+import SpinalLog from "./SpinalLog";
 
 export {
   SpinalGraph,
@@ -43,5 +44,6 @@ export {
   SpinalNetwork,
   SpinalDevice,
   SpinalEndpoint,
-  TimeSeries
+  TimeSeries,
+  SpinalLog
 };
