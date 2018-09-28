@@ -111,8 +111,11 @@ class SpinalApplication extends globalType.Model {
    * @param {SpinalRelation} relation
    * @memberof SpinalApplication
    */
-  addRelation(relation) {
-    if (!this.relatedGraph.isReserved(relation.type.get())) {
+  addRelation(relation, argRelatedGraph = null) {
+    if (!argRelatedGraph)
+      argRelatedGraph = this.relatedGraph;
+
+    if (!argRelatedGraph.isReserved(relation.type.get())) {
       this.addRelationType(relation.type.get());
       if (typeof this.relationsByType[relation.type.get()] === "undefined") {
         let list = new Lst();
