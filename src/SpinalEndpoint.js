@@ -57,7 +57,8 @@ class SpinalEndpoint extends globalType.Model {
         },
         alarmType: new Choice(1, ["min", "normal", "max"]),
         oldAlarmType: oldAlarmType,
-        dataNature: dataNature
+        dataNature: dataNature,
+        currentLog: new Model()
       });
 
       if (typeof dataType !== "undefined")
